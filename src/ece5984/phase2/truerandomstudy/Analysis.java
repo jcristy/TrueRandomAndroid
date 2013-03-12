@@ -19,6 +19,11 @@ public class Analysis
 		randoms = new ArrayList<Integer>();
 		bitStream = new StringBuilder();
 	}
+	/**
+	 * Checks for streaks and other information
+	 * TODO should look for repeating bits
+	 * @param data
+	 */
 	public void runAnalysis(ArrayList<DataPair> data)
 	{
 		int bits = 0;
