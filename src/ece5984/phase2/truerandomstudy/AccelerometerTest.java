@@ -27,7 +27,7 @@ public class AccelerometerTest implements Test, SensorEventListener
 	public int initialize(Context context, ByteArrayOutputStream raw) 
 	{
 		Log.d("Accel_test","Initialize Accelerometer");
-		this.baos = baos;
+		this.baos = raw;
 		sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
         bits = new int[planned_tests.length];

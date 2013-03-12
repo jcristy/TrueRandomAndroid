@@ -95,7 +95,7 @@ public class TrueRandomStudy extends Activity {
 	    	 * Change these values to change the testing parameters
 	    	 * TODO Add to UI so that users can do this on a test by test basis
 	    	 */
-	    	int timeInSeconds = 60*5;
+	    	int timeInSeconds = 60;
 	    	int checksPerSecond = 2;
 	    	for (int i=0; i<timeInSeconds*checksPerSecond; i++)
 	    	{
