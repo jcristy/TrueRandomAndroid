@@ -109,7 +109,7 @@ public class TrueRandomStudy extends Activity {
 	    		for (int j=0;j<numTests;j++)
 	    		{
 	    			DataPair data = theTest.getData(j);
-	    			Log.d("DataAtTRS",i+": "+j+" :"+Integer.toHexString(data.value));
+	    			//Log.d("DataAtTRS",i+": "+j+" :"+Integer.toHexString(data.value));
 	    			allData.get(j).add(data);
 	    		}
 	    	}
