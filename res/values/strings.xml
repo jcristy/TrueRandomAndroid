@@ -1,0 +1,8 @@
+<resources>
+
+    <string name="app_name">TrueRandomStudy</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_true_random_study">True Random Study</string>
+
+</resources>
