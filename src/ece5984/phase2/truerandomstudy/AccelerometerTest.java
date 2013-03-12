@@ -1,6 +1,7 @@
 package ece5984.phase2.truerandomstudy;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -15,6 +16,9 @@ public class AccelerometerTest implements Test, SensorEventListener
 	boolean change = false;
 	SensorManager sensorManager;
 	ByteArrayOutputStream baos;
+	/**
+	 * All of tests that will be run by the framework
+	 */
 	static String[] planned_tests = {"1 bit cycle between axis", "1 bit one axis", "1 bit per axis", "2 bit cycle","2 bit per axis","3 bit cycle","3 bit per axis","LS 8 bits per axis","4 bits per axis 0xF0","8 bits per axis 0xFF0","2 bits per axis 0x6","XOR 1 bit per axis","XOR 2 bits per axis"};
 	
 	int[] bits;
@@ -53,6 +57,12 @@ public class AccelerometerTest implements Test, SensorEventListener
 	public void onSensorChanged(SensorEvent event) 
 	{
 		values = event.values;
+		try {
+			baos.write((values[0]+","+values[1]+","+values[2]).getBytes());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		int x,y,z;
 		for (int type=0; type<planned_tests.length;type++)
 		{

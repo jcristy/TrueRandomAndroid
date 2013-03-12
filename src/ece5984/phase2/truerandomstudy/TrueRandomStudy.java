@@ -18,6 +18,12 @@ import android.view.Menu;
 import android.view.View;
 import android.webkit.WebView;
 
+/**
+ * TrueRandomStudy creates a framework for testing various sensors for Random qualities 
+ * @author John
+ *
+ */
+
 public class TrueRandomStudy extends Activity {
 
     @Override
@@ -25,11 +31,12 @@ public class TrueRandomStudy extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_true_random_study);
         SensorManager sensorManager = (SensorManager)this.getSystemService(Context.SENSOR_SERVICE);
+        //We print out the sensors to see what is available on the device
         List<Sensor> deviceSensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
         for (Sensor s : deviceSensors)
         	Log.d("Devices:", s.getName()+" "+s.getPower());
     }
-
+    //TODO Implement onPause, sensors should not be left running
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_true_random_study, menu);
@@ -74,7 +81,9 @@ public class TrueRandomStudy extends Activity {
     
     	@Override
 		public void run() {
-			// TODO Auto-generated method stub
+			/**
+			 * raw allows for the various tests to write raw data as it becomes available for debugging
+			 */
     		ByteArrayOutputStream raw = new ByteArrayOutputStream();
 	    	int numTests = theTest.initialize(context, raw);
 	    	ArrayList<ArrayList<DataPair>> allData = new ArrayList<ArrayList<DataPair>>();
@@ -82,6 +91,10 @@ public class TrueRandomStudy extends Activity {
 	    	{
 	    		allData.add(new ArrayList<DataPair>());
 	    	}
+	    	/**
+	    	 * Change these values to change the testing parameters
+	    	 * TODO Add to UI so that users can do this on a test by test basis
+	    	 */
 	    	int timeInSeconds = 60*5;
 	    	int checksPerSecond = 2;
 	    	for (int i=0; i<timeInSeconds*checksPerSecond; i++)
@@ -105,9 +118,15 @@ public class TrueRandomStudy extends Activity {
 	    	Log.d("Testing","Analysis");
 	    	String forWebView = "<html><body>";
 	    	try {
-	    		//File myRawFile = new File("/sdcard/random_test_raw.csv");
-	    		//myRawFile.createNewFile();
-	    		
+	    		File myRawFile = new File("/sdcard/random_test_raw.csv");
+	    		myRawFile.createNewFile();
+	    		FileOutputStream fRawOut = new FileOutputStream(myRawFile);
+	    		fRawOut.write(raw.toByteArray());
+	    		fRawOut.close();
+	    	} catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    	try{
 	            File myFile = new File("/sdcard/random_test_data.csv");
 	            myFile.createNewFile();
 	            FileOutputStream fOut = new FileOutputStream(myFile);

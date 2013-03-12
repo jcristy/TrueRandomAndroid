@@ -19,7 +19,18 @@ public interface Test
 	 * @return the number of bits that are relevant
 	 */
 	public DataPair getData(int test);
+	/**
+	 * The test should close down any listeners it had, it will not be called again
+	 */
 	public void finish();
+	/**
+	 * 
+	 * @return an array of strings describing the various tests performed 
+	 */
 	public String[] describeTests();
+	/**
+	 * 
+	 * @return if the test framework needs to actually wait for the time to pass (PRNG should return false)
+	 */
 	public boolean timeMatters();
 }
