@@ -14,10 +14,16 @@ public class Analysis
 	int currentStreak = 0;
 	public ArrayList<Integer> randoms;
 	public StringBuilder bitStream;
+	int[] pairs = new int[4];
+	int[] triples = new int[8];
 	public Analysis()
 	{
 		randoms = new ArrayList<Integer>();
 		bitStream = new StringBuilder();
+		for (int i = 0; i<4; i++)
+			pairs[i] = 0;
+		for (int i = 0; i<8; i++)
+			triples[i] = 0;
 	}
 	/**
 	 * Checks for streaks and other information
@@ -29,6 +35,7 @@ public class Analysis
 		int bits = 0;
 		int currentInteger = 0;
 		int currentBit = 0;
+		int stream = 0;
 		for (int i=0; i<data.size();i++)
 		{
 			DataPair current = data.get(i);
@@ -36,6 +43,8 @@ public class Analysis
 			for (int j=0; j<current.bits; j++)
 			{
 				currentBit = current.value & 0x1;
+				stream = stream << 1;
+				stream = stream | currentBit;
 				bitStream.append(currentBit);
 				//Construct Randoms
 				currentInteger = currentInteger << 1;
@@ -57,6 +66,17 @@ public class Analysis
 				if (currentBit == 0) zeros++;
 				else if (currentBit == 1) ones++;
 				
+				//check double
+				if (bits > 1)
+				{
+					pairs[stream&0x3]++;
+				}
+				//check triple
+				if (bits > 2)
+				{
+					triples[stream&0x7]++;
+				}
+					
 				if (currentBit == lastbit) currentStreak++;
 				else if (currentBit != lastbit)
 				{
@@ -78,11 +98,20 @@ public class Analysis
 	}
 	public static String header()
 	{
-		return ("Test Title,Zeros,Ones,Longest Streak of Zeros,Longest Streak of Ones,Average Streak Length of Zeros, Average Streak Length of Ones,Bit Stream");
+		return ("Test Title,Zeros,Ones,Longest Streak of Zeros,Longest Streak of Ones,Average Streak Length of Zeros, Average Streak Length of Ones," +
+				"'00,'01,'10,'11,'000,'001,'010,'011,'100,'101,'110,'111,Bit Stream");
 	}
 	public String toString(String title) 
 	{
-		return (title+","+zeros+","+ones+","+longestStreaks[0]+","+longestStreaks[1]+","+(((double)totalOfStreaks[0])/numStreaks[0])+","+(((double)totalOfStreaks[1])/numStreaks[1])+","+getBitStream());
+		StringBuilder sb = new StringBuilder();
+		sb.append(title+","+zeros+","+ones+","+longestStreaks[0]+","+longestStreaks[1]+","+(((double)totalOfStreaks[0])/numStreaks[0])+","+(((double)totalOfStreaks[1])/numStreaks[1])+",");
+		for (int i=0; i<pairs.length;i++)	
+			sb.append(pairs[i]+",");
+		for (int i=0; i<triples.length;i++)
+			sb.append(triples[i]+",");
+				
+		sb.append(getBitStream());
+		return (sb.toString());
 	}
 	public String getRandomIntegers()
 	{
