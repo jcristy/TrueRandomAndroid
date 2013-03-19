@@ -35,8 +35,8 @@ public class Grapher
 		percentage = (((float)analysis.ones)/(analysis.ones+analysis.zeros));
 		canvas.drawRect(20, 180-percentage*170, 40, 180, paint);
 		canvas.save();
-		canvas.rotate(90, 0, 100);
-		canvas.drawText(df.format(percentage*100)+"%", 0, 100, paintBlack);
+		canvas.rotate(90, 20, 100);
+		canvas.drawText(df.format(percentage*100)+"%", 20, 100, paintBlack);
 		canvas.restore();
 		
 		paint.setColor(Color.BLUE);
