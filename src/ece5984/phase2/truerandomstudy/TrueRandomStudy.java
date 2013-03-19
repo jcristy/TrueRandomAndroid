@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
@@ -78,7 +79,10 @@ public class TrueRandomStudy extends Activity {
         	theTest = new AccelerometerTest();
         	break;
         case R.id.gps_test:
+        	theTest = new GPSTest();
         	
+    		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 0, (GPSTest)theTest);
         	break;
         case R.id.test_proximity:
         	theTest = new ProximityTest();
@@ -122,7 +126,7 @@ public class TrueRandomStudy extends Activity {
 	    	 * Change these values to change the testing parameters
 	    	 * TODO Add to UI so that users can do this on a test by test basis
 	    	 */
-	    	int timeInSeconds = 10;
+	    	int timeInSeconds = 60;
 	    	int checksPerSecond = 2;
 	    	for (int i=0; i<timeInSeconds*checksPerSecond; i++)
 	    	{
