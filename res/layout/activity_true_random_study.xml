@@ -70,6 +70,13 @@
                 android:layout_height="wrap_content"
                 android:onClick="test"
                 android:text="Prox." />
+
+            <Button
+                android:id="@+id/CDMATest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="test"
+                android:text="CdmaStat" />
 
         </TableRow>
 

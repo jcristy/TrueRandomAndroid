@@ -90,6 +90,9 @@ public class TrueRandomStudy extends Activity {
     		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 0, (NetworkLocationTest)theTest);
         	break;
+        case R.id.CDMATest:
+        	theTest = new NetworkStatusTest();
+        	break;
         case R.id.test_proximity:
         	theTest = new ProximityTest();
         	break;
@@ -132,7 +135,7 @@ public class TrueRandomStudy extends Activity {
 	    	 * Change these values to change the testing parameters
 	    	 * TODO Add to UI so that users can do this on a test by test basis
 	    	 */
-	    	int timeInSeconds = 60*5;
+	    	int timeInSeconds = 60;
 	    	int checksPerSecond = 2;
 	    	for (int i=0; i<timeInSeconds*checksPerSecond; i++)
 	    	{
@@ -165,7 +168,7 @@ public class TrueRandomStudy extends Activity {
 	        }
 	    	analyses.clear();
 	    	try{
-	            File myFile = new File("/sdcard/random_test_data.csv");
+	            File myFile = new File("/sdcard/random_"+theTest.getClass().getCanonicalName()+"_"+System.currentTimeMillis()+".csv");
 	            myFile.createNewFile();
 	            FileOutputStream fOut = new FileOutputStream(myFile);
 	            OutputStreamWriter myOutWriter = 
