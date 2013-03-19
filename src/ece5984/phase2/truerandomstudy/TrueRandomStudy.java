@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.ImageView;
 
 /**
  * TrueRandomStudy creates a framework for testing various sensors for Random qualities 
@@ -95,7 +96,7 @@ public class TrueRandomStudy extends Activity {
 	    	 * Change these values to change the testing parameters
 	    	 * TODO Add to UI so that users can do this on a test by test basis
 	    	 */
-	    	int timeInSeconds = 60;
+	    	int timeInSeconds = 10;
 	    	int checksPerSecond = 2;
 	    	for (int i=0; i<timeInSeconds*checksPerSecond; i++)
 	    	{
@@ -126,6 +127,7 @@ public class TrueRandomStudy extends Activity {
 	    	} catch (Exception e) {
 	            e.printStackTrace();
 	        }
+	    	final ArrayList<Analysis> analyses = new ArrayList<Analysis>();
 	    	try{
 	            File myFile = new File("/sdcard/random_test_data.csv");
 	            myFile.createNewFile();
@@ -141,6 +143,7 @@ public class TrueRandomStudy extends Activity {
 	        		String output = analysis.toString(theTest.describeTests()[i]);
 	        		forWebView = forWebView + output;
 	        		myOutWriter.append(output+"\r\n");
+	        		analyses.add(analysis);
 	        	}
 	            
 	            
@@ -152,8 +155,14 @@ public class TrueRandomStudy extends Activity {
 	    	
 	    	forWebView = "</body></html>";
 	    	Log.d("Testing","Updating Web View");
-	    	((WebView)findViewById(R.id.webView_results)).loadData(forWebView, "html/text", null);
-	
+	    	
+	    	runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                	((ImageView) TrueRandomStudy.this.findViewById(R.id.forGraph)).setImageBitmap(Grapher.graph(analyses.get(0)));
+                }
+            });
+	    	
 		}
     }
 }
