@@ -24,9 +24,21 @@ public class Grapher
 		paint.setTextAlign(Align.CENTER);
 		canvas.drawLine(0, 180, 200, 180, paint);
 		canvas.drawText("0", 10, 200, paint);
-		canvas.drawRect(0, 180-(((float)analysis.zeros)/(analysis.ones+analysis.zeros))*170, 20, 180, paint);
+		float percentage = (((float)analysis.zeros)/(analysis.ones+analysis.zeros));
+		canvas.drawRect(0, 180-percentage*170, 20, 180, paint);
+		canvas.save();
+		canvas.rotate(90, 0, 100);
+		canvas.drawText(df.format(percentage*100)+"%", 0, 100, paintBlack);
+		canvas.restore();
+		
 		canvas.drawText("1", 30, 200, paint);
-		canvas.drawRect(20, 180-(((float)analysis.ones)/(analysis.ones+analysis.zeros))*170, 40, 180, paint);
+		percentage = (((float)analysis.ones)/(analysis.ones+analysis.zeros));
+		canvas.drawRect(20, 180-percentage*170, 40, 180, paint);
+		canvas.save();
+		canvas.rotate(90, 0, 100);
+		canvas.drawText(df.format(percentage*100)+"%", 0, 100, paintBlack);
+		canvas.restore();
+		
 		paint.setColor(Color.BLUE);
 		int sum = 0;
 		for (int i=0;i<4;i++)
@@ -36,7 +48,7 @@ public class Grapher
 		}
 		for (int i=0;i<4;i++)
 		{
-			float percentage = (((float)analysis.pairs[i])/sum);
+			percentage = (((float)analysis.pairs[i])/sum);
 			float left = 40+i*20;
 			float top = 180-percentage*170;
 			canvas.drawRect(left,top,left+20,180, paint);
@@ -54,7 +66,7 @@ public class Grapher
 		}
 		for (int i=0;i<8;i++)
 		{
-			float percentage = (((float)analysis.triples[i])/sum);
+			percentage = (((float)analysis.triples[i])/sum);
 			float left = 120+i*10;
 			float top = 180-percentage*170;
 			canvas.save();
