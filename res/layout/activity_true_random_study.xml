@@ -14,13 +14,13 @@
             android:id="@+id/tableRow1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
-
+
             <Button
                 android:id="@+id/accelerometer_test"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="test"
-                android:text="Accelerometer" />
+                android:text="Accel." />
 
             <Button
                 android:id="@+id/system_stats_test"
@@ -35,6 +35,14 @@
                 android:layout_height="wrap_content"
                 android:onClick="test"
                 android:text="GPS" />
+
+            <Button
+                android:id="@+id/network_location_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="test"
+                android:text="NLoc" />
+
         </TableRow>
 
         <TableRow
@@ -55,13 +63,13 @@
                 android:layout_height="wrap_content"
                 android:onClick="test"
                 android:text="Light" />
-
+
             <Button
                 android:id="@+id/test_proximity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="test"
-                android:text="Proximity" />
+                android:text="Prox." />
 
         </TableRow>
 
