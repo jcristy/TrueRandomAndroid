@@ -16,8 +16,11 @@ import android.hardware.SensorManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
  * TrueRandomStudy creates a framework for testing various sensors for Random qualities 
@@ -27,6 +30,9 @@ import android.widget.ImageView;
 
 public class TrueRandomStudy extends Activity {
 
+	final ArrayList<Analysis> analyses = new ArrayList<Analysis>();
+	int shown = 0;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +42,26 @@ public class TrueRandomStudy extends Activity {
         List<Sensor> deviceSensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
         for (Sensor s : deviceSensors)
         	Log.d("Devices:", s.getName()+" "+s.getPower());
+        OnClickListener ocl;
+        ((Button)findViewById(R.id.showNext)).setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) 
+			{
+				shown = (shown+1)%analyses.size();
+				
+				((ImageView) TrueRandomStudy.this.findViewById(R.id.forGraph)).setImageBitmap(Grapher.graph(analyses.get(shown)));
+				((TextView) TrueRandomStudy.this.findViewById(R.id.testShown)).setText(analyses.get(shown).description);
+			}
+        });
+        ((Button)findViewById(R.id.showPrevious)).setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) 
+			{
+				shown = (shown-1)%analyses.size();
+				((ImageView) TrueRandomStudy.this.findViewById(R.id.forGraph)).setImageBitmap(Grapher.graph(analyses.get(shown)));
+				((TextView) TrueRandomStudy.this.findViewById(R.id.testShown)).setText(analyses.get(shown).description);
+			}
+        });
     }
     //TODO Implement onPause, sensors should not be left running
     @Override
@@ -127,7 +153,7 @@ public class TrueRandomStudy extends Activity {
 	    	} catch (Exception e) {
 	            e.printStackTrace();
 	        }
-	    	final ArrayList<Analysis> analyses = new ArrayList<Analysis>();
+	    	analyses.clear();
 	    	try{
 	            File myFile = new File("/sdcard/random_test_data.csv");
 	            myFile.createNewFile();
@@ -138,7 +164,7 @@ public class TrueRandomStudy extends Activity {
 	            for (int i=0; i<numTests;i++)
 	        	{
 	        		ArrayList<DataPair> current = allData.get(i);
-	        		Analysis analysis = new Analysis();
+	        		Analysis analysis = new Analysis(theTest.describeTests()[i]);
 	        		analysis.runAnalysis(current);
 	        		String output = analysis.toString(theTest.describeTests()[i]);
 	        		forWebView = forWebView + output;
@@ -159,7 +185,10 @@ public class TrueRandomStudy extends Activity {
 	    	runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                	((ImageView) TrueRandomStudy.this.findViewById(R.id.forGraph)).setImageBitmap(Grapher.graph(analyses.get(0)));
+                	//shown = 0;
+                	shown = shown%analyses.size();
+                	((ImageView) TrueRandomStudy.this.findViewById(R.id.forGraph)).setImageBitmap(Grapher.graph(analyses.get(shown)));
+                	((TextView) TrueRandomStudy.this.findViewById(R.id.testShown)).setText(analyses.get(shown).description);
                 }
             });
 	    	

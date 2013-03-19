@@ -16,8 +16,10 @@ public class Analysis
 	public StringBuilder bitStream;
 	int[] pairs = new int[4];
 	int[] triples = new int[8];
-	public Analysis()
+	public String description;
+	public Analysis(String description)
 	{
+		this.description = description; 
 		randoms = new ArrayList<Integer>();
 		bitStream = new StringBuilder();
 		for (int i = 0; i<4; i++)
