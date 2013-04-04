@@ -19,7 +19,7 @@ public class AccelerometerTest implements Test, SensorEventListener
 	/**
 	 * All of tests that will be run by the framework
 	 */
-	static String[] planned_tests = {"1 bit cycle between axis", "1 bit one axis", "1 bit per axis", "2 bit cycle","2 bit per axis","3 bit cycle","3 bit per axis","LS 8 bits per axis","4 bits per axis 0xF0","8 bits per axis 0xFF0","2 bits per axis 0x6","XOR 1 bit per axis","XOR 2 bits per axis"};
+	static String[] planned_tests = {"1 bit cycle between axis", "1 bit X axis","1 bit Y axis","1 bit Z axis", "1 bit per axis", "2 bit cycle","2 bit per axis","3 bit cycle","3 bit per axis","LS 8 bits per axis","4 bits per axis 0xF0","8 bits per axis 0xFF0","2 bits per axis 0x6","XOR 1 bit per axis","XOR 2 bits per axis","Bit Change"};
 	
 	int[] bits;
 	int[] random;
@@ -29,7 +29,7 @@ public class AccelerometerTest implements Test, SensorEventListener
 		Log.d("Accel_test","Initialize Accelerometer");
 		this.baos = raw;
 		sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
-        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), /*SensorManager.SENSOR_DELAY_NORMAL*/SensorManager.SENSOR_DELAY_FASTEST);
         bits = new int[planned_tests.length];
         random = new int[planned_tests.length];
         return planned_tests.length;
@@ -50,6 +50,7 @@ public class AccelerometerTest implements Test, SensorEventListener
 		sensorManager.unregisterListener(this);
 	}
 
+	long time = 0;
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {}
 	
@@ -80,81 +81,108 @@ public class AccelerometerTest implements Test, SensorEventListener
 			case 1://1 bit one axis
 				bits[type] = 1;
 				x = Float.floatToIntBits(values[0]);
-				random[type] = x & 0x1;
+				random[type] = (x & 0x2)>>1;
 				break;
-			case 2://1 bit per axis
+			case 2:
+				bits[type] = 1;
+				x = Float.floatToIntBits(values[1]);
+				random[type] = (x & 0x2)>>1;
+				break;
+			case 3:
+				bits[type] = 1;
+				x = Float.floatToIntBits(values[2]);
+				random[type] = (x & 0x2)>>1;
+				break;
+			case 4://1 bit per axis
 				bits[type] = 3;
 				x = Float.floatToIntBits(values[0])&0x1;
 				y = Float.floatToIntBits(values[1])&0x1;
 				z = Float.floatToIntBits(values[2])&0x1;
 				random[type] = (x<<2)|(y<<1)|z;
 				break;
-			case 3://2 bit cycle
+			case 5://2 bit cycle
 				bits[type] = 2;
 				x = Float.floatToIntBits(values[cycle]);
 				random[type] = x & 0x3;
 				break;
-			case 4://2 bit per axis
+			case 6://2 bit per axis
 				bits[type] = 6;
 				x = Float.floatToIntBits(values[0])&0x3;
 				y = Float.floatToIntBits(values[1])&0x3;
 				z = Float.floatToIntBits(values[2])&0x3;
 				random[type] = (x<<4)|(y<<2)|z;
 				break;
-			case 5://3 bit cycle
+			case 7://3 bit cycle
 				bits[type] = 3;
 				x = Float.floatToIntBits(values[cycle]);
 				random[type] = x & 0x7;
 				break;
-			case 6://3 bit per axis
+			case 8://3 bit per axis
 				bits[type] = 9;
 				x = Float.floatToIntBits(values[0])&0x7;
 				y = Float.floatToIntBits(values[1])&0x7;
 				z = Float.floatToIntBits(values[2])&0x7;
 				random[type] = (x<<6)|(y<<3)|z;
 				break;
-			case 7://8 bits per axis
+			case 9://8 bits per axis
 				bits[type] = 24;
 				x = Float.floatToIntBits(values[0])&0xFF;
 				y = Float.floatToIntBits(values[1])&0xFF;
 				z = Float.floatToIntBits(values[2])&0xFF;
 				random[type] = (x<<16)|(y<<8)|z;
 				break;
-			case 8://4 bits per axis, but not LS 0xF0
+			case 10://4 bits per axis, but not LS 0xF0
 				bits[type] = 12;
 				x = Float.floatToIntBits(values[0])&0xF0;
 				y = Float.floatToIntBits(values[1])&0xF0;
 				z = Float.floatToIntBits(values[2])&0xF0;
 				random[type] = (x<<4)|y|(z>>4);
 				break;
-			case 9://8 bits per axis, but not LSB 0xFF0
+			case 11://8 bits per axis, but not LSB 0xFF0
 				bits[type] = 24;
 				x = Float.floatToIntBits(values[0])&0xFF0;
 				y = Float.floatToIntBits(values[1])&0xFF0;
 				z = Float.floatToIntBits(values[2])&0xFF0;
 				random[type] = (x<<12)|(y<<4)|(z>>4);
 				break;
-			case 10://2 bits per axis, ignore LSb = 0x6
+			case 12://2 bits per axis, ignore LSb = 0x6
 				bits[type] = 6;
 				x = Float.floatToIntBits(values[0])&0x6;
 				y = Float.floatToIntBits(values[1])&0x6;
 				z = Float.floatToIntBits(values[2])&0x6;
 				random[type] = (x<<3)|(y<<1)|(z>>1);
 				break;
-			case 11://XOR of 1 bit per axis
+			case 13://XOR of 1 bit per axis
 				bits[type] = 1;
 				x = Float.floatToIntBits(values[0])&0x1;
 				y = Float.floatToIntBits(values[1])&0x1;
 				z = Float.floatToIntBits(values[2])&0x1;
 				random[type] = (x)^(y)^(z);
 				break;
-			case 12://XOR of 2 bits per axis
+			case 14://XOR of 2 bits per axis
 				bits[type] = 1;
 				x = Float.floatToIntBits(values[0])&0x3;
 				y = Float.floatToIntBits(values[1])&0x3;
 				z = Float.floatToIntBits(values[2])&0x3;
 				int temp = (x)^(y)^(z);
 				random[type] = (temp==0x3 || temp==0?0:1);
+				break;
+			case 15:
+				bits[type] = 3;
+				x = Float.floatToIntBits(values[0]);
+				y = Float.floatToIntBits(values[1]);
+				z = Float.floatToIntBits(values[2]);
+				temp = 0;
+				if (prevX!=x)
+					temp = temp | 0x1;
+				if (prevY!=y)
+					temp = temp | 0x2;
+				if (prevZ!=z)
+					temp = temp | 0x4;
+				prevX=x;
+				prevY=y;
+				prevZ=z;
+				random[type] = temp;
 			}
 			
 			 
@@ -167,9 +195,12 @@ public class AccelerometerTest implements Test, SensorEventListener
 		baos.write(x);
 		baos.write(y);
 		baos.write(z);*/
-		Log.d("Data: ", ""+x+" "+y+" "+z);
+		Log.d("Data: ", ""+x+" "+y+" "+z+" time: "+(System.currentTimeMillis()-time));
+		time = System.currentTimeMillis();
 	}
-
+		int prevX=0;
+		int prevY=0;
+		int prevZ=0;
 	@Override
 	public String[] describeTests() {
 		return planned_tests;
