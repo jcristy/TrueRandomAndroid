@@ -231,4 +231,13 @@ public class AccelerometerTest implements Test, SensorEventListener
 	}
 
 	public boolean timeMatters() { return true;}
+	
+	public void clear()
+	{
+		for (ArrayList<DataPair> al : dataPairs)
+		{
+			al.clear();
+		}
+	}
+	
 }

@@ -104,5 +104,12 @@ public class AmbientLightTest implements Test, SensorEventListener
 			dataPairs.get(i).add(toReturn);
 		}
 	}
-
+	public void clear()
+	{
+		for (ArrayList<DataPair> al : dataPairs)
+		{
+			al.clear();
+		}
+	}
+	
 }

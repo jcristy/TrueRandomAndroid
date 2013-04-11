@@ -105,4 +105,13 @@ public class NetworkStatusTest extends PhoneStateListener implements Test {
 		bits[1] = 1;
 		Log.d("Data: ",signalStrength.getCdmaDbm()+", "+signalStrength.getEvdoDbm()+", "+signalStrength.getCdmaEcio()+", "+signalStrength.getEvdoEcio()+", "+signalStrength.getEvdoSnr());
 	}
+	
+	public void clear()
+	{
+		for (ArrayList<DataPair> al : dataPairs)
+		{
+			al.clear();
+		}
+	}
+	
 }

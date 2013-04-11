@@ -37,5 +37,7 @@ public interface Test
 	 */
 	public boolean timeMatters();
 	
+	public void clear();
+	
 	//public boolean available(List<Sensor> sensors);
 }

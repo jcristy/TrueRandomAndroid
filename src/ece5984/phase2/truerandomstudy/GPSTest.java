@@ -113,4 +113,13 @@ public class GPSTest implements Test, LocationListener {
 		
 	}
 
+	
+	public void clear()
+	{
+		for (ArrayList<DataPair> al : dataPairs)
+		{
+			al.clear();
+		}
+	}
+	
 }

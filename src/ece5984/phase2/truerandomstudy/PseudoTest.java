@@ -39,4 +39,10 @@ public class PseudoTest implements Test {
 			data.add(new DataPair(32,rand.nextInt()));
 		return data;
 	}
+	
+	public void clear()
+	{
+		
+	}
+	
 }

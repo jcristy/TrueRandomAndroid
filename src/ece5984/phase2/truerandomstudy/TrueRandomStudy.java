@@ -160,7 +160,7 @@ public class TrueRandomStudy extends Activity {
     				{
     					data.get(j).add(round_data.get(k));
     				}
-    				
+    				tests.get(j).clear();
     			}
     		}
     		ArrayList<ArrayList<Byte>> all_data = new ArrayList<ArrayList<Byte>>();

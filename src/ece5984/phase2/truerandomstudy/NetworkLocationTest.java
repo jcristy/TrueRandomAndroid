@@ -114,5 +114,14 @@ public class NetworkLocationTest implements Test, LocationListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void clear()
+	{
+		for (ArrayList<DataPair> al : dataPairs)
+		{
+			al.clear();
+		}
+	}
+	
 
 }
