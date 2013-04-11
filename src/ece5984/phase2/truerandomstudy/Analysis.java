@@ -2,6 +2,8 @@ package ece5984.phase2.truerandomstudy;
 
 import java.util.ArrayList;
 
+import android.util.Log;
+
 public class Analysis 
 {
 	int zeros = 0;
@@ -17,6 +19,7 @@ public class Analysis
 	public StringBuilder bitStream;
 	int[] pairs = new int[4];
 	int[] triples = new int[8];
+	int[] quads = new int[16];
 	public String description;
 	public Analysis(String description)
 	{
@@ -28,6 +31,8 @@ public class Analysis
 			pairs[i] = 0;
 		for (int i = 0; i<8; i++)
 			triples[i] = 0;
+		for (int i=0;i<16;i++)
+			quads[i] = 0;
 	}
 	/**
 	 * Checks for streaks and other information
@@ -43,10 +48,11 @@ public class Analysis
 		for (int i=0; i<data.size();i++)
 		{
 			DataPair current = data.get(i);
+			int current_value = current.value;
 			if (current.bits==0) continue;
 			for (int j=0; j<current.bits; j++)
 			{
-				currentBit = current.value & 0x1;
+				currentBit = current_value & 0x1;
 				stream = stream << 1;
 				stream = stream | currentBit;
 				bitStream.append(currentBit);
@@ -54,16 +60,18 @@ public class Analysis
 				currentInteger = currentInteger << 1;
 				currentInteger = currentInteger | currentBit;
 				bits++;
+				if (bits % 8 == 0)
+				{
+					
+					random_bytes.add(Byte.valueOf((byte) (currentInteger&0xFF)));
+				}
 				if (bits == 32)
 				{
 					randoms.add(Integer.valueOf(currentInteger));
 					currentInteger = 0;
 					bits = 0;
 				}
-				if (bits % 8 == 0)
-				{
-					random_bytes.add(Byte.valueOf((byte) (currentInteger&0xFF)));
-				}
+				
 				//Perform Analysis
 				if (lastbit==-1)//First Time, so nothing should matter
 				{
@@ -74,14 +82,19 @@ public class Analysis
 				else if (currentBit == 1) ones++;
 				
 				//check double
-				if (bits > 1)
+				if (bits > 1 && bits%2==0)
 				{
 					pairs[stream&0x3]++;
 				}
 				//check triple
-				if (bits > 2)
+				if (bits > 2 && bits%3==0)
 				{
 					triples[stream&0x7]++;
+				}
+				//check quad
+				if (bits > 3 && bits%4==0)
+				{
+					quads[stream&0xF]++;
 				}
 					
 				if (currentBit == lastbit) currentStreak++;
@@ -97,7 +110,7 @@ public class Analysis
 				}
 					
 				lastbit = currentBit;
-				current.value = current.value >> 1;
+				current_value = current_value >> 1;
 			}
 		}
 		totalOfStreaks[currentBit] = totalOfStreaks[currentBit] + currentStreak;
@@ -134,5 +147,47 @@ public class Analysis
 	public String getBitStream()
 	{
 		return bitStream.toString()+"b";
+	}
+	/**
+	 * 
+	 * @param bits which pattern length to check for
+	 * @return the difference from the expected value
+	 */
+	public double getScore(int bits)
+	{
+		double toReturn = 0;
+		if (bits==1)
+		{
+			double sum = zeros + ones;
+			toReturn = Math.abs(.5-zeros/(sum))+Math.abs(.5-ones/(sum));
+		}
+		if (bits==2)
+		{
+			double expected = .25;
+			double sum = 0;
+			for (int i=0;i<4;i++)
+				sum+=pairs[i];
+			for (int i=0;i<4;i++)
+				toReturn += Math.abs(expected-pairs[i]/sum);
+		}
+		if (bits==3)
+		{
+			double expected = .125;
+			double sum = 0;
+			for (int i=0;i<8;i++)
+				sum+=pairs[i];
+			for (int i=0;i<8;i++)
+				toReturn += Math.abs(expected-pairs[i]/sum);
+		}
+		if (bits==4)
+		{
+			double expected = .0625;
+			double sum = 0;
+			for (int i=0;i<16;i++)
+				sum+=pairs[i];
+			for (int i=0;i<16;i++)
+				toReturn += Math.abs(expected-pairs[i]/sum);
+		}
+		return toReturn;
 	}
 }

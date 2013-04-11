@@ -45,6 +45,7 @@ public class TrueRandomStudy extends Activity {
         for (Sensor s : deviceSensors)
         	Log.d("Devices:", s.getName()+" "+s.getPower());
         OnClickListener ocl;
+        /*
         ((Button)findViewById(R.id.showNext)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) 
@@ -63,7 +64,7 @@ public class TrueRandomStudy extends Activity {
 				((ImageView) TrueRandomStudy.this.findViewById(R.id.forGraph)).setImageBitmap(Grapher.graph(analyses.get(shown)));
 				((TextView) TrueRandomStudy.this.findViewById(R.id.testShown)).setText(analyses.get(shown).description);
 			}
-        });
+        });*/
     }
     //TODO Implement onPause, sensors should not be left running
     @Override
@@ -142,28 +143,33 @@ public class TrueRandomStudy extends Activity {
     			data.add(new ArrayList<DataPair>());
     		}
     		
-    		int minutes = 3;
+    		int minutes = 6;
     		
     		for (int i=0;i<minutes;i++)
     		{
-    			for (int j=0; j<tests.size();j++)
-    			{
-    				data.get(j).addAll(tests.get(j).getData());
-    				tests.get(j).getData().clear();
-    			}
     			try {
 					Thread.sleep(10000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+    			for (int j=0; j<tests.size();j++)
+    			{
+    				
+    				ArrayList<DataPair> round_data = tests.get(j).getData();
+    				for (int k=0;k<round_data.size();k++)
+    				{
+    					data.get(j).add(round_data.get(k));
+    				}
+    				
+    			}
     		}
     		ArrayList<ArrayList<Byte>> all_data = new ArrayList<ArrayList<Byte>>();
     		for (int i=0; i<tests.size();i++)
     		{
     			Analysis analysis = new Analysis("");
     			analysis.runAnalysis(data.get(i));
-    			all_data.add(analysis.getRandomBytes());
+    			ArrayList<Byte> randomBytes = analysis.getRandomBytes();
+    			all_data.add(randomBytes);
     		}
     		
 	    	//Now Shuffle byte by byte
@@ -176,7 +182,9 @@ public class TrueRandomStudy extends Activity {
     			{
     				if (all_data.get(i).size()>0)
     				{
-    					completeData.add(new DataPair(8,all_data.get(i).remove(0)));
+    					Byte nextByte = all_data.get(i).remove(0);
+    					completeData.add(new DataPair(8,nextByte));
+    					Log.d("data","byte: "+nextByte);
     					stillMore = true;
     				}
     			}

@@ -47,7 +47,24 @@ public class AccelerometerTest implements Test, SensorEventListener
 	@Override
 	public ArrayList<DataPair> getData() 
 	{
-		return dataPairs.get(0);
+		int best = 0;
+		double score = 1;
+		for(int i=0;i<planned_tests.length;i++)
+		{
+			Analysis analysis = new Analysis("");
+			
+			analysis.runAnalysis(dataPairs.get(i));
+			double new_score = analysis.getScore(1);
+			Log.d("Accel","Spread for "+planned_tests[i]+":"+analysis.zeros+" "+analysis.ones+" score:"+new_score);
+			if (new_score<score)
+			{
+				score = new_score;
+				best = i;
+			}
+		}
+		Log.d("Accel","Best was "+planned_tests[best]);
+		
+		return dataPairs.get(best);
 	}
 
 	@Override
