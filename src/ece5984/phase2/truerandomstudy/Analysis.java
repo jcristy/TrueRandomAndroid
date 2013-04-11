@@ -175,18 +175,18 @@ public class Analysis
 			double expected = .125;
 			double sum = 0;
 			for (int i=0;i<8;i++)
-				sum+=pairs[i];
+				sum+=triples[i];
 			for (int i=0;i<8;i++)
-				toReturn += Math.abs(expected-pairs[i]/sum);
+				toReturn += Math.abs(expected-triples[i]/sum);
 		}
 		if (bits==4)
 		{
 			double expected = .0625;
 			double sum = 0;
 			for (int i=0;i<16;i++)
-				sum+=pairs[i];
+				sum+=quads[i];
 			for (int i=0;i<16;i++)
-				toReturn += Math.abs(expected-pairs[i]/sum);
+				toReturn += Math.abs(expected-quads[i]/sum);
 		}
 		return toReturn;
 	}

@@ -14,6 +14,7 @@ public class Grapher
 	public static Bitmap graph(Analysis analysis)
 	{
 		DecimalFormat df = new DecimalFormat("#.#");
+		DecimalFormat df2 = new DecimalFormat("#.###");
 		Bitmap bmp = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565);
 		Canvas canvas = new Canvas(bmp);
 		Paint paintBlack = new Paint();
@@ -38,6 +39,7 @@ public class Grapher
 		canvas.rotate(90, 20, 100);
 		canvas.drawText(df.format(percentage*100)+"%", 20, 100, paintBlack);
 		canvas.restore();
+		canvas.drawText(df2.format(analysis.getScore(1)), 0, 160, paintBlack);
 		
 		paint.setColor(Color.BLUE);
 		int sum = 0;
@@ -57,6 +59,7 @@ public class Grapher
 			canvas.drawText(df.format(percentage*100)+"%", left, 100, paintBlack);
 			canvas.restore();
 		}
+		canvas.drawText(df2.format(analysis.getScore(2)), 40, 160, paintBlack);
 		paint.setColor(Color.GREEN);
 		sum = 0;
 		for (int i=0;i<8;i++)
@@ -75,6 +78,7 @@ public class Grapher
 			canvas.drawText(df.format(percentage*100)+"%", left, 100, paintBlack);
 			canvas.restore();
 		}
+		canvas.drawText(df2.format(analysis.getScore(3)), 120, 160, paintBlack);
 		return bmp;
 		
 	}
