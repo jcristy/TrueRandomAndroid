@@ -1,6 +1,7 @@
 package ece5984.phase2.truerandomstudy;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -16,6 +17,7 @@ public class ProximityTest implements Test, SensorEventListener
 	int[] randoms;
 	SensorManager sensorManager;
 	float value;
+	ArrayList<ArrayList<DataPair>> dataPairs; 
 	@Override
 	public int initialize(Context context, ByteArrayOutputStream raw) 
 	{
@@ -24,15 +26,19 @@ public class ProximityTest implements Test, SensorEventListener
 		randoms = new int[plannedTests.length];
 		sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_NORMAL);
-		return plannedTests.length;
+		
+        dataPairs = new ArrayList<ArrayList<DataPair>>();
+        for (int i=0; i<plannedTests.length;i++)
+        {
+        	dataPairs.add(new ArrayList<DataPair>());
+        }
+        
+        return plannedTests.length;
 	}
 
 	@Override
-	public DataPair getData(int test) {
-		DataPair toReturn = new DataPair(bits[test],randoms[test]);
-		bits[test] = 0;
-		randoms[test] = 0;
-		return toReturn;
+	public ArrayList<DataPair> getData() {
+		return dataPairs.get(0);
 	}
 
 	@Override
@@ -93,6 +99,8 @@ public class ProximityTest implements Test, SensorEventListener
 					randoms[i] = randoms[i]^((x>>j)&0x1);
 				break;
 			}
+			DataPair toReturn = new DataPair(bits[i],bits[i]);
+			dataPairs.get(i).add(toReturn);
 		}
 	}
 

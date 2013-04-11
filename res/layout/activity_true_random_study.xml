@@ -1,6 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/test_light"
+    android:id="@+id/test_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -14,70 +14,78 @@
             android:id="@+id/tableRow1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
-
-            <Button
+
+            <CheckBox
                 android:id="@+id/accelerometer_test"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="test"
+                
                 android:text="Accel." />
 
-            <Button
+            <CheckBox
                 android:id="@+id/system_stats_test"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="test"
+                
                 android:text="System " />
 
-            <Button
+            <CheckBox
                 android:id="@+id/gps_test"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="test"
+                
                 android:text="GPS" />
-
-            <Button
-                android:id="@+id/network_location_test"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="test"
-                android:text="NLoc" />
-
         </TableRow>
 
         <TableRow
             android:id="@+id/tableRow2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
-
-            <Button
+			<CheckBox
+                android:id="@+id/network_location_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                
+                android:text="NLoc" />
+            <CheckBox
                 android:id="@+id/pseudo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="test"
+                
                 android:text="Pseudo" />
-
-            <Button
+
+            <CheckBox
                 android:id="@+id/test_light"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="test"
+                
                 android:text="Light" />
-
-            <Button
+        </TableRow>
+        <TableRow>
+            
+            <CheckBox
                 android:id="@+id/test_proximity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="test"
+                
                 android:text="Prox." />
-
-            <Button
+
+
+
+
+            <CheckBox
                 android:id="@+id/CDMATest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="test"
+                
                 android:text="CdmaStat" />
 
+			<Button
+			    android:id="@+id/StartTests"
+			    android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="test"
+                android:text="Start Tests"/>
         </TableRow>
 
     </TableLayout>
@@ -90,16 +98,14 @@
             android:id="@+id/showPrevious"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Previous" />
-
+            android:text="Previous" />
         <TextView
             android:id="@+id/testShown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Test" />
-
+            android:text="Test" />
         <Button
             android:id="@+id/showNext"
             android:layout_width="wrap_content"

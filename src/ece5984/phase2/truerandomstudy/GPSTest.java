@@ -1,6 +1,7 @@
 package ece5984.phase2.truerandomstudy;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.location.Location;
@@ -16,19 +17,23 @@ public class GPSTest implements Test, LocationListener {
 	int[] bits = new int[]{0,0,0,0,0};
 	int[] data = new int[]{0,0,0,0,0};
 	Context context;
+	ArrayList<ArrayList<DataPair>> dataPairs;
+	
 	@Override
 	public int initialize(Context context, ByteArrayOutputStream raw) {
 		this.context = context;
-		
+		dataPairs = new ArrayList<ArrayList<DataPair>>();
+        for (int i=0; i<describeTests().length;i++)
+        {
+        	dataPairs.add(new ArrayList<DataPair>());
+        }
 		return 5;
 	}
 
 	@Override
-	public DataPair getData(int test) {
-		DataPair toReturn = new DataPair(bits[test],data[test]);
-		bits[test] = 0;
-		data[test] = 0;
-		return toReturn;
+	public ArrayList<DataPair> getData() {
+		
+		return dataPairs.get(0);
 	}
 
 	@Override
@@ -59,7 +64,7 @@ public class GPSTest implements Test, LocationListener {
 		long skew = (currentJavaTime-prevJavaTime)-(currentGPSTime-prevGPSTime);
 		prevGPSTime = location.getTime();
 		prevJavaTime = currentJavaTime;
-		Log.d("Data: ", ""+rawLat+" "+rawLon+" "+location.getAccuracy()+" "+location.getTime()+" "+skew);
+		//Log.d("Data: ", ""+rawLat+" "+rawLon+" "+location.getAccuracy()+" "+location.getTime()+" "+skew);
 		bits[0] = 2;
 		data[0] = (int)(rawLat&0x1 | ((rawLon&0x1)<<1));
 		bits[1] = 4;
@@ -81,6 +86,12 @@ public class GPSTest implements Test, LocationListener {
 			data[3] = 0;
 			bits[4] = 0;
 			data[4] = 0;
+		}
+		for (int i=0;i<5;i++)
+		{
+			dataPairs.get(i).add(new DataPair(bits[i],data[i]));
+			bits[i] = 0;
+			data[i] = 0;
 		}
 	}
 

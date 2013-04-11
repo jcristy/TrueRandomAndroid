@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -71,52 +72,60 @@ public class TrueRandomStudy extends Activity {
         return true;
     }
     public void test(View view) {
-        Test theTest = new PseudoTest();
-        
-    	switch (view.getId())
+        Test theTest;
+        ArrayList<Test> tests = new ArrayList();
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+    	if (((CheckBox)findViewById(R.id.accelerometer_test)).isChecked())
+    	{
+        	tests.add(new AccelerometerTest());
+    	}
+        if (((CheckBox)findViewById(R.id.gps_test)).isChecked())
         {
-        case R.id.accelerometer_test:
-        	theTest = new AccelerometerTest();
-        	break;
-        case R.id.gps_test:
         	theTest = new GPSTest();
-        	
-    		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 0, (GPSTest)theTest);
-        	break;
-        case R.id.network_location_test:
-        	theTest = new NetworkLocationTest();
-        	
-    		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 0, (NetworkLocationTest)theTest);
-        	break;
-        case R.id.CDMATest:
-        	theTest = new NetworkStatusTest();
-        	break;
-        case R.id.test_proximity:
-        	theTest = new ProximityTest();
-        	break;
-        case R.id.test_light:
-        	theTest = new AmbientLightTest();
-        	break;
-        case R.id.system_stats_test:
-        	
-        	break;
-        case R.id.pseudo:
-        default:
-        	theTest = new PseudoTest();
+            tests.add(theTest);
         }
-    	Thread t = new Thread(new RunTheTests(this,theTest));
+        if (((CheckBox)findViewById(R.id.network_location_test)).isChecked())
+        {
+        	theTest = new NetworkLocationTest();
+            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 0, (NetworkLocationTest)theTest);
+            tests.add(theTest);
+        }
+        if (((CheckBox)findViewById(R.id.CDMATest)).isChecked())
+        {
+        	theTest = new NetworkStatusTest();
+        	tests.add(theTest);
+        }
+        if (((CheckBox)findViewById(R.id.test_proximity)).isChecked())
+        {
+        	theTest = new ProximityTest();
+        	tests.add(theTest);
+        }
+        if (((CheckBox)findViewById(R.id.test_light)).isChecked())
+        {
+        	theTest = new AmbientLightTest();
+        	tests.add(theTest);
+        }
+        if (((CheckBox)findViewById(R.id.system_stats_test)).isChecked())
+        {
+        	
+        }
+        if (((CheckBox)findViewById(R.id.pseudo)).isChecked())
+        {
+        	theTest = new PseudoTest();
+        	tests.add(theTest);
+        }
+    	Thread t = new Thread(new RunTheTests(this,tests));
     	t.start();
     }
-    public class RunTheTests implements Runnable
+    final class RunTheTests implements Runnable
     {
     	Context context;
-    	Test theTest;
-    	public RunTheTests(Context context, Test theTest)
+    	ArrayList<Test> tests;
+    	public RunTheTests(Context context, ArrayList<Test> tests)
     	{
     		this.context = context;
-    		this.theTest = theTest;
+    		this.tests = tests;
     	}
     
     	@Override
@@ -124,84 +133,63 @@ public class TrueRandomStudy extends Activity {
 			/**
 			 * raw allows for the various tests to write raw data as it becomes available for debugging
 			 */
-    		ByteArrayOutputStream raw = new ByteArrayOutputStream();
-	    	int numTests = theTest.initialize(context, raw);
-	    	ArrayList<ArrayList<DataPair>> allData = new ArrayList<ArrayList<DataPair>>();
-	    	for (int i=0; i<numTests;i++)
-	    	{
-	    		allData.add(new ArrayList<DataPair>());
-	    	}
-	    	/**
-	    	 * Change these values to change the testing parameters
-	    	 * TODO Add to UI so that users can do this on a test by test basis
-	    	 */
-	    	int timeInSeconds = 60;
-	    	int checksPerSecond = 2;
-	    	for (int i=0; i<timeInSeconds*checksPerSecond; i++)
-	    	{
-	    		if ((i & 0xF) == 0x8) Log.d("Testing","On "+i+" of 120");
-	    		try {
-					if (theTest.timeMatters()) Thread.sleep(1000/checksPerSecond);
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		ArrayList<ArrayList<DataPair>> data = new ArrayList<ArrayList<DataPair>>();
+    		
+    		for (int i=0; i<tests.size();i++)
+    		{
+    			tests.get(i).initialize(context, baos);
+    			data.add(new ArrayList<DataPair>());
+    		}
+    		
+    		int minutes = 3;
+    		
+    		for (int i=0;i<minutes;i++)
+    		{
+    			for (int j=0; j<tests.size();j++)
+    			{
+    				data.get(j).addAll(tests.get(j).getData());
+    				tests.get(j).getData().clear();
+    			}
+    			try {
+					Thread.sleep(10000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	    		for (int j=0;j<numTests;j++)
-	    		{
-	    			DataPair data = theTest.getData(j);
-	    			//Log.d("DataAtTRS",i+": "+j+" :"+Integer.toHexString(data.value));
-	    			allData.get(j).add(data);
-	    		}
-	    	}
-	    	theTest.finish();
-	    	//Now Analyze
-	    	Log.d("Testing","Analysis");
-	    	String forWebView = "<html><body>";
-	    	try {
-	    		File myRawFile = new File("/sdcard/random_test_raw.csv");
-	    		myRawFile.createNewFile();
-	    		FileOutputStream fRawOut = new FileOutputStream(myRawFile);
-	    		fRawOut.write(raw.toByteArray());
-	    		fRawOut.close();
-	    	} catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	    	analyses.clear();
-	    	try{
-	            File myFile = new File("/sdcard/random_"+theTest.getClass().getCanonicalName()+"_"+System.currentTimeMillis()+".csv");
-	            myFile.createNewFile();
-	            FileOutputStream fOut = new FileOutputStream(myFile);
-	            OutputStreamWriter myOutWriter = 
-	                                    new OutputStreamWriter(fOut);
-	            myOutWriter.append(Analysis.header()+"\r\n");
-	            for (int i=0; i<numTests;i++)
-	        	{
-	        		ArrayList<DataPair> current = allData.get(i);
-	        		Analysis analysis = new Analysis(theTest.describeTests()[i]);
-	        		analysis.runAnalysis(current);
-	        		String output = analysis.toString(theTest.describeTests()[i]);
-	        		forWebView = forWebView + output;
-	        		myOutWriter.append(output+"\r\n");
-	        		analyses.add(analysis);
-	        	}
-	            
-	            
-	            myOutWriter.close();
-	            fOut.close();
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	    	
-	    	forWebView = "</body></html>";
-	    	Log.d("Testing","Updating Web View");
-	    	
+    		}
+    		ArrayList<ArrayList<Byte>> all_data = new ArrayList<ArrayList<Byte>>();
+    		for (int i=0; i<tests.size();i++)
+    		{
+    			Analysis analysis = new Analysis("");
+    			analysis.runAnalysis(data.get(i));
+    			all_data.add(analysis.getRandomBytes());
+    		}
+    		
+	    	//Now Shuffle byte by byte
+    		ArrayList<DataPair> completeData = new ArrayList<DataPair>();
+    		boolean stillMore = true;
+    		while (stillMore)
+    		{
+    			stillMore = false;
+    			for (int i=0;i<tests.size();i++)
+    			{
+    				if (all_data.get(i).size()>0)
+    				{
+    					completeData.add(new DataPair(8,all_data.get(i).remove(0)));
+    					stillMore = true;
+    				}
+    			}
+    		}
+    		final Analysis finalAnalysis = new Analysis("Total Data");
+    		finalAnalysis.runAnalysis(completeData);
 	    	runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                 	//shown = 0;
-                	shown = shown%analyses.size();
-                	((ImageView) TrueRandomStudy.this.findViewById(R.id.forGraph)).setImageBitmap(Grapher.graph(analyses.get(shown)));
-                	((TextView) TrueRandomStudy.this.findViewById(R.id.testShown)).setText(analyses.get(shown).description);
+                	//shown = shown%analyses.size();
+                	((ImageView) TrueRandomStudy.this.findViewById(R.id.forGraph)).setImageBitmap(Grapher.graph(finalAnalysis));
+                	((TextView) TrueRandomStudy.this.findViewById(R.id.testShown)).setText(finalAnalysis.description);
                 }
             });
 	    	

@@ -13,6 +13,7 @@ public class Analysis
 	long[] totalOfStreaks = {0,0};
 	int currentStreak = 0;
 	public ArrayList<Integer> randoms;
+	public ArrayList<Byte> random_bytes;
 	public StringBuilder bitStream;
 	int[] pairs = new int[4];
 	int[] triples = new int[8];
@@ -21,6 +22,7 @@ public class Analysis
 	{
 		this.description = description; 
 		randoms = new ArrayList<Integer>();
+		random_bytes = new ArrayList<Byte>();
 		bitStream = new StringBuilder();
 		for (int i = 0; i<4; i++)
 			pairs[i] = 0;
@@ -54,11 +56,14 @@ public class Analysis
 				bits++;
 				if (bits == 32)
 				{
-					randoms.add(new Integer(currentInteger));
+					randoms.add(Integer.valueOf(currentInteger));
 					currentInteger = 0;
 					bits = 0;
 				}
-				
+				if (bits % 8 == 0)
+				{
+					random_bytes.add(Byte.valueOf((byte) (currentInteger&0xFF)));
+				}
 				//Perform Analysis
 				if (lastbit==-1)//First Time, so nothing should matter
 				{
@@ -114,6 +119,10 @@ public class Analysis
 				
 		sb.append(getBitStream());
 		return (sb.toString());
+	}
+	public ArrayList<Byte> getRandomBytes()
+	{
+		return random_bytes;
 	}
 	public String getRandomIntegers()
 	{

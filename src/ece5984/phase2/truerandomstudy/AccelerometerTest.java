@@ -2,6 +2,7 @@ package ece5984.phase2.truerandomstudy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -14,6 +15,7 @@ public class AccelerometerTest implements Test, SensorEventListener
 {
 	float[] values = {0,0,0};
 	boolean change = false;
+	ArrayList<ArrayList<DataPair>> dataPairs;
 	SensorManager sensorManager;
 	ByteArrayOutputStream baos;
 	/**
@@ -29,19 +31,23 @@ public class AccelerometerTest implements Test, SensorEventListener
 		Log.d("Accel_test","Initialize Accelerometer");
 		this.baos = raw;
 		sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
-        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), /*SensorManager.SENSOR_DELAY_NORMAL*/SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
         bits = new int[planned_tests.length];
         random = new int[planned_tests.length];
+        
+        dataPairs = new ArrayList<ArrayList<DataPair>>();
+        for (int i=0; i<planned_tests.length;i++)
+        {
+        	dataPairs.add(new ArrayList<DataPair>());
+        }
+        	
         return planned_tests.length;
 	}
 	int cycle=0;
 	@Override
-	public DataPair getData(int type) 
+	public ArrayList<DataPair> getData() 
 	{
-		DataPair toReturn = new DataPair(bits[type],random[type]);
-		bits[type] = 0;
-		random[type] = 0;
-		return toReturn;
+		return dataPairs.get(0);
 	}
 
 	@Override
@@ -184,9 +190,10 @@ public class AccelerometerTest implements Test, SensorEventListener
 				prevZ=z;
 				random[type] = temp;
 			}
-			
-			 
+			DataPair toReturn = new DataPair(bits[type],random[type]);
+			dataPairs.get(type).add(toReturn); 
 		}
+		
 		x = Float.floatToIntBits(values[0]);
 		y = Float.floatToIntBits(values[1]);
 		z = Float.floatToIntBits(values[2]);
@@ -195,7 +202,7 @@ public class AccelerometerTest implements Test, SensorEventListener
 		baos.write(x);
 		baos.write(y);
 		baos.write(z);*/
-		Log.d("Data: ", ""+x+" "+y+" "+z+" time: "+(System.currentTimeMillis()-time));
+		//Log.d("Data: ", ""+x+" "+y+" "+z+" time: "+(System.currentTimeMillis()-time));
 		time = System.currentTimeMillis();
 	}
 		int prevX=0;

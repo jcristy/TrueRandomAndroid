@@ -1,8 +1,11 @@
 package ece5984.phase2.truerandomstudy;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
+import android.hardware.Sensor;
 
 public interface Test 
 {
@@ -18,7 +21,7 @@ public interface Test
 	 * @param test which test is to be collected
 	 * @return the number of bits that are relevant
 	 */
-	public DataPair getData(int test);
+	public ArrayList<DataPair> getData();
 	/**
 	 * The test should close down any listeners it had, it will not be called again
 	 */
@@ -33,4 +36,6 @@ public interface Test
 	 * @return if the test framework needs to actually wait for the time to pass (PRNG should return false)
 	 */
 	public boolean timeMatters();
+	
+	//public boolean available(List<Sensor> sensors);
 }
