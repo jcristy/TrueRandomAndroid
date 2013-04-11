@@ -148,7 +148,7 @@ public class TrueRandomStudy extends Activity {
     		for (int i=0;i<minutes;i++)
     		{
     			try {
-					Thread.sleep(10000);
+					Thread.sleep(20000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

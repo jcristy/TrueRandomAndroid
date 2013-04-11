@@ -21,7 +21,7 @@ public class AccelerometerTest implements Test, SensorEventListener
 	/**
 	 * All of tests that will be run by the framework
 	 */
-	static String[] planned_tests = {"1 bit cycle between axis", "1 bit X axis","1 bit Y axis","1 bit Z axis", "1 bit per axis", "2 bit cycle","2 bit per axis","3 bit cycle","3 bit per axis","LS 8 bits per axis","4 bits per axis 0xF0","8 bits per axis 0xFF0","2 bits per axis 0x6","XOR 1 bit per axis","XOR 2 bits per axis","Bit Change"};
+	static String[] planned_tests = {"1 bit cycle between axis", "1 bit X axis","1 bit Y axis","1 bit Z axis", "1 bit per axis", "2 bit cycle","2 bit per axis","3 bit cycle","3 bit per axis","2nd LSB","X Y","Y Z","2 bits per axis 0x6","XOR 1 bit per axis","XOR 2 bits per axis","Bit Change"};
 	
 	int[] bits;
 	int[] random;
@@ -48,13 +48,13 @@ public class AccelerometerTest implements Test, SensorEventListener
 	public ArrayList<DataPair> getData() 
 	{
 		int best = 0;
-		double score = 1;
+		double score = Double.MAX_VALUE;
 		for(int i=0;i<planned_tests.length;i++)
 		{
 			Analysis analysis = new Analysis("");
 			
 			analysis.runAnalysis(dataPairs.get(i));
-			double new_score = analysis.getScore(1);
+			double new_score = analysis.getScore();
 			Log.d("Accel","Spread for "+planned_tests[i]+":"+analysis.zeros+" "+analysis.ones+" score:"+new_score);
 			if (new_score<score)
 			{
@@ -63,8 +63,10 @@ public class AccelerometerTest implements Test, SensorEventListener
 			}
 		}
 		Log.d("Accel","Best was "+planned_tests[best]);
-		
-		return dataPairs.get(best);
+		if (score>2)//All Crap
+			return new ArrayList<DataPair>();
+		else
+			return dataPairs.get(best);
 	}
 
 	@Override
@@ -138,35 +140,35 @@ public class AccelerometerTest implements Test, SensorEventListener
 			case 7://3 bit cycle
 				bits[type] = 3;
 				x = Float.floatToIntBits(values[cycle]);
-				random[type] = x & 0x7;
+				random[type] = 0;//x & 0x7;
 				break;
 			case 8://3 bit per axis
 				bits[type] = 9;
 				x = Float.floatToIntBits(values[0])&0x7;
 				y = Float.floatToIntBits(values[1])&0x7;
 				z = Float.floatToIntBits(values[2])&0x7;
-				random[type] = (x<<6)|(y<<3)|z;
+				random[type] = 0;//(x<<6)|(y<<3)|z;
 				break;
-			case 9://8 bits per axis
-				bits[type] = 24;
-				x = Float.floatToIntBits(values[0])&0xFF;
-				y = Float.floatToIntBits(values[1])&0xFF;
-				z = Float.floatToIntBits(values[2])&0xFF;
-				random[type] = (x<<16)|(y<<8)|z;
+			case 9://2nd LSB
+				bits[type] = 3;
+				x = Float.floatToIntBits(values[0])&0x2;
+				y = Float.floatToIntBits(values[1])&0x2;
+				z = Float.floatToIntBits(values[2])&0x2;
+				random[type] = (x<<1)|(y)|(z>>1);
 				break;
-			case 10://4 bits per axis, but not LS 0xF0
-				bits[type] = 12;
-				x = Float.floatToIntBits(values[0])&0xF0;
-				y = Float.floatToIntBits(values[1])&0xF0;
-				z = Float.floatToIntBits(values[2])&0xF0;
-				random[type] = (x<<4)|y|(z>>4);
+			case 10://X Y
+				bits[type] = 2;
+				x = Float.floatToIntBits(values[0])&0x1;
+				y = Float.floatToIntBits(values[1])&0x1;
+				//z = Float.floatToIntBits(values[2])&0xF0;
+				random[type] = (x<<1)|y;
 				break;
-			case 11://8 bits per axis, but not LSB 0xFF0
-				bits[type] = 24;
-				x = Float.floatToIntBits(values[0])&0xFF0;
+			case 11://Y Z
+				bits[type] = 2;
+				//x = Float.floatToIntBits(values[0])&0xFF0;
 				y = Float.floatToIntBits(values[1])&0xFF0;
 				z = Float.floatToIntBits(values[2])&0xFF0;
-				random[type] = (x<<12)|(y<<4)|(z>>4);
+				random[type] = (y<<1)|z;
 				break;
 			case 12://2 bits per axis, ignore LSb = 0x6
 				bits[type] = 6;
@@ -190,7 +192,7 @@ public class AccelerometerTest implements Test, SensorEventListener
 				int temp = (x)^(y)^(z);
 				random[type] = (temp==0x3 || temp==0?0:1);
 				break;
-			case 15:
+			case 15://Which bit changed?!?!?
 				bits[type] = 3;
 				x = Float.floatToIntBits(values[0]);
 				y = Float.floatToIntBits(values[1]);
@@ -205,7 +207,7 @@ public class AccelerometerTest implements Test, SensorEventListener
 				prevX=x;
 				prevY=y;
 				prevZ=z;
-				random[type] = temp;
+				random[type] = 0;// temp;
 			}
 			DataPair toReturn = new DataPair(bits[type],random[type]);
 			dataPairs.get(type).add(toReturn); 

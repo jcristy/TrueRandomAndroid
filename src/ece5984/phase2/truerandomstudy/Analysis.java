@@ -148,6 +148,13 @@ public class Analysis
 	{
 		return bitStream.toString()+"b";
 	}
+	public double getScore()
+	{
+		double score = 0;
+		for (int i=1;i<=4;i++)
+			score+=getScore(i);
+		return score;
+	}
 	/**
 	 * 
 	 * @param bits which pattern length to check for
