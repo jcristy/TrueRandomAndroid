@@ -102,7 +102,7 @@ public class Grapher
 			if (occurrences[i]==max)
 				canvas.drawText(""+i+":"+occurrences[i], i, 30, paintBlack);
 		}
-		
+		analysis.description = "Total Data: "+random_bytes.size()+" (b)";
 		return bmp;
 		
 	}
