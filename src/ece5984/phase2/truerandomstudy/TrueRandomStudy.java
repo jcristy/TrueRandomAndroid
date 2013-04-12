@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.location.LocationManager;
@@ -142,13 +143,13 @@ public class TrueRandomStudy extends Activity {
     			tests.get(i).initialize(context, baos);
     			data.add(new ArrayList<DataPair>());
     		}
-    		
-    		int minutes = 6;
-    		
-    		for (int i=0;i<minutes;i++)
+    		int PERIOD = 20000;
+    		int ROUNDS = 3*60;
+    		Date d = new Date();
+    		for (int i=0;i<ROUNDS;i++)
     		{
     			try {
-					Thread.sleep(20000);
+					Thread.sleep(PERIOD);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -162,10 +163,12 @@ public class TrueRandomStudy extends Activity {
     				}
     				tests.get(j).clear();
     			}
+    			Log.d("Time:","Started at: "+d.toString()+" "+i+"/"+ROUNDS);
     		}
     		ArrayList<ArrayList<Byte>> all_data = new ArrayList<ArrayList<Byte>>();
     		for (int i=0; i<tests.size();i++)
     		{
+    			tests.get(i).finish();
     			Analysis analysis = new Analysis("");
     			analysis.runAnalysis(data.get(i));
     			ArrayList<Byte> randomBytes = analysis.getRandomBytes();
@@ -189,8 +192,23 @@ public class TrueRandomStudy extends Activity {
     				}
     			}
     		}
+    		
     		final Analysis finalAnalysis = new Analysis("Total Data");
     		finalAnalysis.runAnalysis(completeData);
+    		try{
+	    		File myFile = new File("/sdcard/random_bytes"+System.currentTimeMillis()+".csv");
+	            myFile.createNewFile();
+	            FileOutputStream fOut = new FileOutputStream(myFile);
+	            OutputStreamWriter myOutWriter = 
+	                                    new OutputStreamWriter(fOut);
+	            ArrayList<Byte> random_bytes = finalAnalysis.getRandomBytes();
+	            myOutWriter.append("Period,"+PERIOD+"\r\n");
+	            myOutWriter.append("Rounds,"+ROUNDS+"\r\n");
+	            for (int i=0;i<random_bytes.size();i++)
+	            	myOutWriter.append(""+random_bytes.get(i)+"\r\n");
+	            myOutWriter.close();
+    		}catch(Exception e){}
+    		
 	    	runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
