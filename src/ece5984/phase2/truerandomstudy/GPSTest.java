@@ -14,8 +14,8 @@ import android.widget.TextView;
 
 public class GPSTest implements Test, LocationListener {
 
-	int[] bits = new int[]{0,0,0,0,0};
-	int[] data = new int[]{0,0,0,0,0};
+	int[] bits = new int[]{0,0,0,0,0,0};
+	int[] data = new int[]{0,0,0,0,0,0};
 	Context context;
 	ArrayList<ArrayList<DataPair>> dataPairs;
 	
@@ -31,9 +31,28 @@ public class GPSTest implements Test, LocationListener {
 	}
 
 	@Override
-	public ArrayList<DataPair> getData() {
-		
-		return dataPairs.get(0);
+	public ArrayList<DataPair> getData() 
+	{
+		int best = 0;
+		double score = Double.MAX_VALUE;
+		for(int i=0;i<describeTests().length;i++)
+		{
+			Analysis analysis = new Analysis("");
+			
+			analysis.runAnalysis(dataPairs.get(i));
+			double new_score = analysis.getScore();
+			Log.d("GPS","Spread for "+describeTests()[i]+":"+analysis.zeros+" "+analysis.ones+" score:"+new_score);
+			if (new_score<score)
+			{
+				score = new_score;
+				best = i;
+			}
+		}
+		Log.d("GPS","Best was "+describeTests()[best]);
+		if (score>2)//All Crap
+			return new ArrayList<DataPair>();
+		else
+			return dataPairs.get(best);
 	}
 
 	@Override
@@ -44,7 +63,7 @@ public class GPSTest implements Test, LocationListener {
 
 	@Override
 	public String[] describeTests() {
-		return new String[]{"1 bit each","2 bits each","1 bit skew","2 bits skew","1 bit lat/lon/skew"};
+		return new String[]{"1 bit each","2 bits each","1 bit skew","2 bits skew","1 bit lat/lon/skew","1 bit each 0x2"};
 	}
 
 	@Override
@@ -69,6 +88,8 @@ public class GPSTest implements Test, LocationListener {
 		data[0] = (int)(rawLat&0x1 | ((rawLon&0x1)<<1));
 		bits[1] = 4;
 		data[1] = (int)(rawLat&0x3 | ((rawLon&0x3)<<2));
+		bits[5] = 2;
+		data[5] = (int)(rawLat&0x2 | ((rawLon&0x2)>>1));
 		if (prevGPSTime != -1)
 		{
 			bits[2] = 1;
