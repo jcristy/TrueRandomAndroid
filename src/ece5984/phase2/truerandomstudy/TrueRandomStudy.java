@@ -117,6 +117,16 @@ public class TrueRandomStudy extends Activity {
         	theTest = new PseudoTest();
         	tests.add(theTest);
         }
+        if (((CheckBox)findViewById(R.id.gsm)).isChecked())
+        {
+        	theTest = new GSM_Test();
+        	tests.add(theTest);
+        }        	
+        if (((CheckBox)findViewById(R.id.wifi)).isChecked())
+        {
+        	theTest = new WiFiTest();
+        	tests.add(theTest);
+        }
     	Thread t = new Thread(new RunTheTests(this,tests));
     	t.start();
     }
@@ -143,8 +153,8 @@ public class TrueRandomStudy extends Activity {
     			tests.get(i).initialize(context, baos);
     			data.add(new ArrayList<DataPair>());
     		}
-    		int PERIOD = 20000;
-    		int ROUNDS = 3*60;
+    		int PERIOD = 10000;
+    		int ROUNDS = 6*1;
     		Date d = new Date();
     		for (int i=0;i<ROUNDS;i++)
     		{

@@ -59,9 +59,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 
-                android:text="Light" />
-        </TableRow>
-        <TableRow>
+                android:text="Light" />        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
             
             <CheckBox
                 android:id="@+id/test_proximity"
@@ -80,14 +82,27 @@
                 
                 android:text="CdmaStat" />
 
-			<Button
+			<CheckBox
+                android:id="@+id/gsm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                
+                android:text="GSM" />
+        </TableRow>
+		<TableRow >
+		    <CheckBox
+                android:id="@+id/wifi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                
+                android:text="WiFi" />
+		    <Button
 			    android:id="@+id/StartTests"
 			    android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="test"
                 android:text="Start Tests"/>
-        </TableRow>
-
+		</TableRow>
     </TableLayout>
 
     <LinearLayout

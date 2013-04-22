@@ -38,7 +38,27 @@ public class ProximityTest implements Test, SensorEventListener
 
 	@Override
 	public ArrayList<DataPair> getData() {
-		return dataPairs.get(0);
+		int best = 0;
+		double score = Double.MAX_VALUE;
+		for(int i=0;i<plannedTests.length;i++)
+		{
+			Analysis analysis = new Analysis("");
+			
+			analysis.runAnalysis(dataPairs.get(i));
+			double new_score = analysis.getScore();
+			Log.d("Proximity","Spread for "+plannedTests[i]+":"+analysis.zeros+" "+analysis.ones+" score:"+new_score);
+			if (new_score<score)
+			{
+				score = new_score;
+				best = i;
+			}
+		}
+		Log.d("Proximity","Best was "+plannedTests[best]);
+		if (score>2)//All Crap
+			return new ArrayList<DataPair>();
+		else
+			return dataPairs.get(best);
+
 	}
 
 	@Override
@@ -65,7 +85,6 @@ public class ProximityTest implements Test, SensorEventListener
 	{
 		value = event.values[0];
 		int x = Float.floatToIntBits(value);
-		Log.d("ProximitySensor",""+value);
 		for (int i=0;i<plannedTests.length;i++)
 		{
 			switch(i)
