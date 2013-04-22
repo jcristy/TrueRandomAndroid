@@ -156,7 +156,7 @@ public class TrueRandomStudy extends Activity {
     			data.add(new ArrayList<DataPair>());
     		}
     		int PERIOD = 10000;
-    		int ROUNDS = 12*1;
+    		int ROUNDS = 1*6;
     		Date d = new Date();
     		for (int i=0;i<ROUNDS;i++)
     		{
@@ -187,8 +187,10 @@ public class TrueRandomStudy extends Activity {
     			all_data.add(randomBytes);
     		}
     		
-	    	//Now Shuffle byte by byte
+	    	
     		ArrayList<DataPair> completeData = new ArrayList<DataPair>();
+    		//Now Shuffle byte by byte
+    		/*
     		boolean stillMore = true;
     		while (stillMore)
     		{
@@ -203,6 +205,27 @@ public class TrueRandomStudy extends Activity {
     					stillMore = true;
     				}
     			}
+    		}
+    		*/
+    		//Shuffle data together bit by bit
+    		int h=0;
+    		boolean stillMore = true;
+    		while (stillMore)
+    		{
+    			ArrayList<Byte> currentBytes = new ArrayList<Byte>();
+    			for (int j=0; j<tests.size();j++)
+    				if (all_data.get(j).size()>0)
+    					currentBytes.add(all_data.get(j).remove(0));
+    			for (int i=0;i<8;i++)//the bit we want
+    			{
+    				int x = 0;
+    				for (int j=0;j<currentBytes.size();j++)//the test we want
+    					x = x | (((currentBytes.get(j).byteValue() & (1 << i))>> i) << (j));
+    				
+    				completeData.add(new DataPair(currentBytes.size(),x));
+    			}
+    			
+    			if (currentBytes.size()==0) stillMore = false;
     		}
     		
     		final Analysis finalAnalysis = new Analysis("Total Data");
@@ -219,6 +242,8 @@ public class TrueRandomStudy extends Activity {
 	            ArrayList<Byte> random_bytes = finalAnalysis.getRandomBytes();
 	            myOutWriter.append("Period,"+PERIOD+"\r\n");
 	            myOutWriter.append("Rounds,"+ROUNDS+"\r\n");
+	            for (Test test : tests)
+	            	myOutWriter.append(test.getClass()+"\r\n");
 	            for (int i=0;i<random_bytes.size();i++)
 	            	myOutWriter.append(""+random_bytes.get(i)+"\r\n");
 	            myOutWriter.close();

@@ -49,7 +49,7 @@ public class GPSTest implements Test, LocationListener {
 			}
 		}
 		Log.d("GPS","Best was "+describeTests()[best]);
-		if (score>4)//All Crap
+		if (score>2)//All Crap
 			return new ArrayList<DataPair>();
 		else
 			return dataPairs.get(best);
