@@ -1,6 +1,7 @@
 package ece5984.phase2.truerandomstudy;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -233,13 +234,16 @@ public class TrueRandomStudy extends Activity {
     		Date date = new Date();
 	    	SimpleDateFormat sdf = new SimpleDateFormat("yyMMddkkmm");
     		String timestamp = sdf.format(date);
+    		
+    		ArrayList<Byte> random_bytes = finalAnalysis.getRandomBytes();
+    		
     		try{
 	    		File myFile = new File("/sdcard/random_bytes"+timestamp+".csv");
 	            myFile.createNewFile();
 	            FileOutputStream fOut = new FileOutputStream(myFile);
 	            OutputStreamWriter myOutWriter = 
 	                                    new OutputStreamWriter(fOut);
-	            ArrayList<Byte> random_bytes = finalAnalysis.getRandomBytes();
+	            
 	            myOutWriter.append("Period,"+PERIOD+"\r\n");
 	            myOutWriter.append("Rounds,"+ROUNDS+"\r\n");
 	            for (Test test : tests)
@@ -248,6 +252,16 @@ public class TrueRandomStudy extends Activity {
 	            	myOutWriter.append(""+random_bytes.get(i)+"\r\n");
 	            myOutWriter.close();
     		}catch(Exception e){}
+    		try {
+ 		       FileOutputStream out = new FileOutputStream("/sdcard/random_bytes"+timestamp+".raw");
+ 		       DataOutputStream dos = new DataOutputStream(out);
+ 		       for (int i=0; i<random_bytes.size();i++)
+ 		    	   dos.writeByte(random_bytes.get(i).byteValue());
+ 		       //dos.write(random_bytes);
+ 		       out.close();
+	 		} catch (Exception e) {
+	 		       e.printStackTrace();
+	 		}
     		try {
     		       FileOutputStream out = new FileOutputStream("/sdcard/random_bytes"+timestamp+".png");
     		       Grapher.graph(finalAnalysis).compress(CompressFormat.PNG, 90, out);
