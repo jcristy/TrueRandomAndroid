@@ -16,7 +16,7 @@ public class Grapher
 	{
 		DecimalFormat df = new DecimalFormat("#.#");
 		DecimalFormat df2 = new DecimalFormat("#.###");
-		Bitmap bmp = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565);
+		Bitmap bmp = Bitmap.createBitmap(256, 200, Bitmap.Config.RGB_565);
 		Canvas canvas = new Canvas(bmp);
 		Paint paintBlack = new Paint();
 		paintBlack.setColor(Color.WHITE);
@@ -96,7 +96,7 @@ public class Grapher
 		}
 		Paint paintYellow = new Paint();
 		paintYellow.setColor(Color.YELLOW);
-		for (int i=0;i<200;i++)
+		for (int i=0;i<256;i++)
 		{
 			canvas.drawLine(i,0,i,(occurrences[i]/((float)max))*90,paintYellow);
 			if (occurrences[i]==max)
