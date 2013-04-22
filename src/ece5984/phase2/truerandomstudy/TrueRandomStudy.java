@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap.CompressFormat;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.util.Log;
@@ -154,7 +156,7 @@ public class TrueRandomStudy extends Activity {
     			data.add(new ArrayList<DataPair>());
     		}
     		int PERIOD = 10000;
-    		int ROUNDS = 6*1;
+    		int ROUNDS = 12*1;
     		Date d = new Date();
     		for (int i=0;i<ROUNDS;i++)
     		{
@@ -205,8 +207,11 @@ public class TrueRandomStudy extends Activity {
     		
     		final Analysis finalAnalysis = new Analysis("Total Data");
     		finalAnalysis.runAnalysis(completeData);
+    		Date date = new Date();
+	    	SimpleDateFormat sdf = new SimpleDateFormat("yyMMddkkmm");
+    		String timestamp = sdf.format(date);
     		try{
-	    		File myFile = new File("/sdcard/random_bytes"+System.currentTimeMillis()+".csv");
+	    		File myFile = new File("/sdcard/random_bytes"+timestamp+".csv");
 	            myFile.createNewFile();
 	            FileOutputStream fOut = new FileOutputStream(myFile);
 	            OutputStreamWriter myOutWriter = 
@@ -218,6 +223,13 @@ public class TrueRandomStudy extends Activity {
 	            	myOutWriter.append(""+random_bytes.get(i)+"\r\n");
 	            myOutWriter.close();
     		}catch(Exception e){}
+    		try {
+    		       FileOutputStream out = new FileOutputStream("/sdcard/random_bytes"+timestamp+".png");
+    		       Grapher.graph(finalAnalysis).compress(CompressFormat.PNG, 90, out);
+    		       out.close();
+    		} catch (Exception e) {
+    		       e.printStackTrace();
+    		}
     		
 	    	runOnUiThread(new Runnable() {
                 @Override
