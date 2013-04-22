@@ -57,7 +57,7 @@ public class WiFiTest implements Test {
 			}
 		}
 		Log.d("WiFi","Best was "+describeTests()[best]);
-		if (score>2.5)//All Crap
+		if (score>2)//All Crap
 			return new ArrayList<DataPair>();
 		else
 			return dataPairs.get(best);
