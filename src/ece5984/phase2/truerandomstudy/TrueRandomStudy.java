@@ -113,7 +113,7 @@ public class TrueRandomStudy extends Activity {
         }
         if (((CheckBox)findViewById(R.id.system_stats_test)).isChecked())
         {
-        	theTest = new CameraTest();//new SystemTest();
+        	theTest = new SystemTest();
         	tests.add(theTest);
         }
         if (((CheckBox)findViewById(R.id.pseudo)).isChecked())
@@ -179,6 +179,11 @@ public class TrueRandomStudy extends Activity {
     			}
     			Log.d("Time:","Started at: "+d.toString()+" "+i+"/"+ROUNDS);
     		}
+    		
+    		Date date = new Date();
+	    	SimpleDateFormat sdf = new SimpleDateFormat("yyMMddkkmm");
+    		String timestamp = sdf.format(date);
+    		
     		ArrayList<ArrayList<Byte>> all_data = new ArrayList<ArrayList<Byte>>();
     		for (int i=0; i<tests.size();i++)
     		{
@@ -187,8 +192,17 @@ public class TrueRandomStudy extends Activity {
     			analysis.runAnalysis(data.get(i));
     			ArrayList<Byte> randomBytes = analysis.getRandomBytes();
     			all_data.add(randomBytes);
+    			try {
+    	 		       FileOutputStream out = new FileOutputStream("/sdcard/random_bytes"+timestamp+"_"+tests.get(i).getClass().getSimpleName()+".raw");
+    	 		       DataOutputStream dos = new DataOutputStream(out);
+    	 		       for (int j=0; j<randomBytes.size();j++)
+    	 		    	   dos.writeByte(randomBytes.get(j).byteValue());
+    	 		       //dos.write(random_bytes);
+    	 		       out.close();
+    		 		} catch (Exception e) {
+    		 		       e.printStackTrace();
+    		 		}
     		}
-    		
 	    	
     		ArrayList<DataPair> completeData = new ArrayList<DataPair>();
     		//Now Shuffle byte by byte
@@ -232,9 +246,6 @@ public class TrueRandomStudy extends Activity {
     		
     		final Analysis finalAnalysis = new Analysis("Total Data");
     		finalAnalysis.runAnalysis(completeData);
-    		Date date = new Date();
-	    	SimpleDateFormat sdf = new SimpleDateFormat("yyMMddkkmm");
-    		String timestamp = sdf.format(date);
     		
     		ArrayList<Byte> random_bytes = finalAnalysis.getRandomBytes();
     		
@@ -248,7 +259,7 @@ public class TrueRandomStudy extends Activity {
 	            myOutWriter.append("Period,"+PERIOD+"\r\n");
 	            myOutWriter.append("Rounds,"+ROUNDS+"\r\n");
 	            for (Test test : tests)
-	            	myOutWriter.append(test.getClass()+"\r\n");
+	            	myOutWriter.append(test.getClass().getSimpleName()+"\r\n");
 	            for (int i=0;i<random_bytes.size();i++)
 	            	myOutWriter.append(""+random_bytes.get(i)+"\r\n");
 	            myOutWriter.close();
