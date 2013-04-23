@@ -113,7 +113,8 @@ public class TrueRandomStudy extends Activity {
         }
         if (((CheckBox)findViewById(R.id.system_stats_test)).isChecked())
         {
-        	
+        	theTest = new CameraTest();//new SystemTest();
+        	tests.add(theTest);
         }
         if (((CheckBox)findViewById(R.id.pseudo)).isChecked())
         {
@@ -157,7 +158,7 @@ public class TrueRandomStudy extends Activity {
     			data.add(new ArrayList<DataPair>());
     		}
     		int PERIOD = 10000;
-    		int ROUNDS = 1*6;
+    		int ROUNDS = 1*1;
     		Date d = new Date();
     		for (int i=0;i<ROUNDS;i++)
     		{
