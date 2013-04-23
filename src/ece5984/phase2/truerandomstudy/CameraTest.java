@@ -43,17 +43,21 @@ public class CameraTest implements Test {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}    
+		}
+        Camera.Parameters parameters = cam.getParameters();
+        parameters.setPreviewFormat(ImageFormat.RGB_565);
+        cam.setParameters(parameters);
+        cam.setPreviewCallback(new preview());
         cam.startPreview();
-		t = new Timer();
-		t.schedule(new TimerTask(){
-
-			@Override
-			public void run() {
-				getImageFromCamera(null);
-			}
-			
-		}, 3000);
+//		t = new Timer();
+//		t.schedule(new TimerTask(){
+//
+//			@Override
+//			public void run() {
+//				//getImageFromCamera(null);
+//			}
+//			
+//		}, 3000);
 		return 0;
 	}
 
@@ -96,14 +100,43 @@ public class CameraTest implements Test {
 		parameters.setJpegQuality(100);
 		parameters.setAntibanding(Parameters.ANTIBANDING_OFF);
 		parameters.setFocusMode(Parameters.FOCUS_MODE_INFINITY);
-		
+		parameters.setPreviewSize(100,100);
 		cam.setParameters(parameters);
 		Log.d("Camera", "Taking picture NOW");
 		JpegCallback jpeg = new JpegCallback(dos);
 		cam.takePicture(null, null, jpeg);
 
 	}
-
+	public class preview implements Camera.PreviewCallback
+	{
+		@Override
+		public void onPreviewFrame(byte[] data, Camera camera) 
+		{
+			Log.d("Camera","data[0]: "+data[0]);
+			return;
+			/*
+				{
+					int pixel = bmp.getPixel(i*(bmp.getWidth()/squares), j*(bmp.getHeight()/squares));
+					int red   = Color.red(pixel);
+					int blue  = Color.blue(pixel);
+					int green = Color.green(pixel);
+					
+					
+					x[0] = x[0] << 1;
+					int thisbit = ((red&0x1)^(blue&0x1)^(green&0x1));
+					x[0] = x[0] | thisbit;
+					Log.d("Camera",""+red+" "+green+" "+blue+" "+thisbit);
+					bits++;
+					if (bits==32)
+					{
+						random_data.get(0).add(new DataPair(32,x[0]));
+						bits = 1;
+					}
+					
+				}
+				*/
+		}
+	}
 	public class OurAutoFocusCallback implements AutoFocusCallback {
 		DataOutputStream dos;
 
