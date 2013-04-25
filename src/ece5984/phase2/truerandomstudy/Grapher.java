@@ -24,6 +24,8 @@ public class Grapher
 		Paint paint = new Paint();
 		paint.setColor(Color.RED);
 		paint.setTextAlign(Align.CENTER);
+		
+		//Draw the 0 and 1 bit distribution
 		canvas.drawLine(0, 180, 200, 180, paint);
 		canvas.drawText("0", 10, 200, paint);
 		float percentage = (((float)analysis.zeros)/(analysis.ones+analysis.zeros));
@@ -42,6 +44,7 @@ public class Grapher
 		canvas.restore();
 		canvas.drawText(df2.format(analysis.getScore(1)), 0, 180, paintBlack);
 		
+		//Draw the 2 bit distribution
 		paint.setColor(Color.BLUE);
 		int sum = 0;
 		for (int i=0;i<4;i++)
@@ -61,6 +64,8 @@ public class Grapher
 			canvas.restore();
 		}
 		canvas.drawText(df2.format(analysis.getScore(2)), 40, 180, paintBlack);
+		
+		//Draw the 3 bit distribution
 		paint.setColor(Color.GREEN);
 		sum = 0;
 		for (int i=0;i<8;i++)
@@ -81,7 +86,14 @@ public class Grapher
 		}
 		canvas.drawText(df2.format(analysis.getScore(3)), 120, 180, paintBlack);
 		
+		
 		ArrayList<Byte> random_bytes = analysis.getRandomBytes();
+		//Write the 4 bit score and the number of bytes
+		canvas.drawText("B:"+random_bytes.size(), 201, 160, paintBlack);
+		canvas.drawText("4s:"+df2.format(analysis.getScore(4)), 201, 180, paintBlack);
+		
+		//Draw the 8 bit distribution 
+		
 		int[] occurrences = new int[256];
 		for (int i=0;i<256;i++)
 		{
