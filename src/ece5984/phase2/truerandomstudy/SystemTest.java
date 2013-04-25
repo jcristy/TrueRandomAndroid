@@ -17,8 +17,8 @@ import android.os.BatteryManager;
 import android.util.Log;
 
 public class SystemTest implements Test {
-	int[] values = {0,0,0,0,0,0,0,0};
-	int[] bits = {0,0,0,0,0,0,0,0};
+	int[] values = {0,0,0,0,0};
+	int[] bits = {0,0,0,0,0};
 	Timer t = new Timer();
 	Context context;
 	
@@ -27,6 +27,7 @@ public class SystemTest implements Test {
 	{
 		
 	}
+	public final static int rate = 10;
 	@Override
 	public int initialize(Context context, ByteArrayOutputStream raw) {
 		this.context = context;
@@ -36,7 +37,7 @@ public class SystemTest implements Test {
         {
         	dataPairs.add(new ArrayList<DataPair>());
         }
-		t.scheduleAtFixedRate(new doIt(), 0, 250);
+		t.schedule(new doIt(), 0, rate);
 		return 8;
 	}
 
@@ -75,7 +76,7 @@ public class SystemTest implements Test {
 	@Override
 	public String[] describeTests() {
 		
-		return new String[]{""};
+		return new String[]{"voltage","voltage","voltage","Skew&0x1","Skew&0x3"};
 	}
 
 	@Override
@@ -85,7 +86,7 @@ public class SystemTest implements Test {
 	}
 	public class doIt extends TimerTask
 	{
-		int previous = 0;
+		public long previous = 0;
 		public void run ()
 		{
 			Intent batteryStatus = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -102,6 +103,26 @@ public class SystemTest implements Test {
 			bits[1] = 1;
 			values[2] = (level&0x3);
 			bits[2] = 2;		
+			
+			long difference =System.currentTimeMillis()-previous;
+			values[3] = ((int)difference)&0x1;
+			bits[3] = 1;
+			if (difference!=rate)
+			{
+				values[4] = (difference<rate?1:0); 
+				bits[4] = 1;
+			}
+			else
+			{
+				values[4] = 0;
+				bits[4] = 0;
+			}
+			
+			
+			previous = System.currentTimeMillis();
+			
+			for (int i=0; i<describeTests().length;i++)
+				dataPairs.get(i).add(new DataPair(bits[i],values[i]));
 		}
 	}
 	public void clear()
