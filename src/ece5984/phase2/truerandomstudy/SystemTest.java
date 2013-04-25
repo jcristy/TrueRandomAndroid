@@ -94,7 +94,7 @@ public class SystemTest implements Test {
 			int temperature = batteryStatus.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
 			int voltage = batteryStatus.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
 			
-			Log.d("Battery",level+" "+temperature+" "+voltage);
+			//Log.d("Battery",level+" "+temperature+" "+voltage);
 			
 			values[0] = level&0x1;
 			bits[0] = 1;
