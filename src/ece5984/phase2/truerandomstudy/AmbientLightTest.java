@@ -25,15 +25,14 @@ public class AmbientLightTest implements Test, SensorEventListener
 		
 		bits = new int[plannedTests.length];
 		randoms = new int[plannedTests.length];
-		sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
-        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_NORMAL);
 		
         dataPairs = new ArrayList<ArrayList<DataPair>>();
         for (int i=0; i<plannedTests.length;i++)
         {
         	dataPairs.add(new ArrayList<DataPair>());
         }
-        
+        sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_NORMAL);
         return plannedTests.length;
 	}
 

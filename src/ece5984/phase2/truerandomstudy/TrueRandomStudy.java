@@ -158,7 +158,7 @@ public class TrueRandomStudy extends Activity {
     			data.add(new ArrayList<DataPair>());
     		}
     		int PERIOD = 10000;
-    		int ROUNDS = 6*1;
+    		int ROUNDS = 6*5;//6 10 second periods in 5 Minutes
     		Date d = new Date();
     		for (int i=0;i<ROUNDS;i++)
     		{

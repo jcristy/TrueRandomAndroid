@@ -30,8 +30,7 @@ public class AccelerometerTest implements Test, SensorEventListener
 	{
 		Log.d("Accel_test","Initialize Accelerometer");
 		this.baos = raw;
-		sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
-        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
+		
         bits = new int[planned_tests.length];
         random = new int[planned_tests.length];
         
@@ -41,6 +40,9 @@ public class AccelerometerTest implements Test, SensorEventListener
         	dataPairs.add(new ArrayList<DataPair>());
         }
 	
+        sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
+        
         return planned_tests.length;
 	}
 	int cycle=0;
