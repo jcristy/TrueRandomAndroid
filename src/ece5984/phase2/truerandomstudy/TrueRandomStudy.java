@@ -158,7 +158,7 @@ public class TrueRandomStudy extends Activity {
     			data.add(new ArrayList<DataPair>());
     		}
     		int PERIOD = 10000;
-    		int ROUNDS = 1*1;
+    		int ROUNDS = 6*1;
     		Date d = new Date();
     		for (int i=0;i<ROUNDS;i++)
     		{
@@ -167,6 +167,7 @@ public class TrueRandomStudy extends Activity {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+    			//Take data from all of the sources for this round
     			for (int j=0; j<tests.size();j++)
     			{
     				
@@ -180,20 +181,31 @@ public class TrueRandomStudy extends Activity {
     			Log.d("Time:","Started at: "+d.toString()+" "+i+"/"+ROUNDS);
     		}
     		
+    		//Timestamp used for filenames
     		Date date = new Date();
 	    	SimpleDateFormat sdf = new SimpleDateFormat("yyMMddkkmm");
     		String timestamp = sdf.format(date);
     		
+    		//All data is a list of lists of the data from each source from all rounds
     		ArrayList<ArrayList<Byte>> all_data = new ArrayList<ArrayList<Byte>>();
+    		
+    		//Create the folder to hold everything
+    		File folder = new File("/sdcard/random_"+timestamp);
+    		if (folder.mkdir())
+    			Log.d("Random","Created the folder");
+    		
+    		//Put everything into lists of bytes
     		for (int i=0; i<tests.size();i++)
     		{
     			tests.get(i).finish();
     			Analysis analysis = new Analysis("");
     			analysis.runAnalysis(data.get(i));
     			ArrayList<Byte> randomBytes = analysis.getRandomBytes();
+    			//Add this test's randomBytes list to the all data  
     			all_data.add(randomBytes);
     			try {
-    	 		       FileOutputStream out = new FileOutputStream("/sdcard/random_bytes"+timestamp+"_"+tests.get(i).getClass().getSimpleName()+".raw");
+    				//Write it out to keep track of it
+    	 		       FileOutputStream out = new FileOutputStream("/sdcard/random_"+timestamp+"/"+tests.get(i).getClass().getSimpleName()+".raw");
     	 		       DataOutputStream dos = new DataOutputStream(out);
     	 		       for (int j=0; j<randomBytes.size();j++)
     	 		    	   dos.writeByte(randomBytes.get(j).byteValue());
@@ -204,94 +216,155 @@ public class TrueRandomStudy extends Activity {
     		 		}
     		}
 	    	
-    		ArrayList<DataPair> completeData = new ArrayList<DataPair>();
+    		ArrayList<DataPair> completeDataBitByBit = new ArrayList<DataPair>();
+    		ArrayList<DataPair> completeDataByteByByte = new ArrayList<DataPair>();
+    		ArrayList<DataPair> completeDataBitByBitLimited = new ArrayList<DataPair>();
+
+    		
+    		//The shuffling destroys the all_data_copy
+    		ArrayList<ArrayList<Byte>> all_data_copy = makeCopy(all_data);
     		//Now Shuffle byte by byte
-    		/*
     		boolean stillMore = true;
     		while (stillMore)
     		{
     			stillMore = false;
     			for (int i=0;i<tests.size();i++)
     			{
-    				if (all_data.get(i).size()>0)
+    				if (all_data_copy.get(i).size()>0)
     				{
-    					Byte nextByte = all_data.get(i).remove(0);
-    					completeData.add(new DataPair(8,nextByte));
+    					Byte nextByte = all_data_copy.get(i).remove(0);
+    					completeDataByteByByte.add(new DataPair(8,nextByte));
     					Log.d("data","byte: "+nextByte);
     					stillMore = true;
     				}
     			}
     		}
-    		*/
+    		
+    		
+    		all_data_copy = makeCopy(all_data);
     		//Shuffle data together bit by bit
-    		int h=0;
-    		boolean stillMore = true;
+    		//int h=0;
+    		stillMore = true;
     		while (stillMore)
     		{
     			ArrayList<Byte> currentBytes = new ArrayList<Byte>();
     			for (int j=0; j<tests.size();j++)
-    				if (all_data.get(j).size()>0)
-    					currentBytes.add(all_data.get(j).remove(0));
+    				if (all_data_copy.get(j).size()>0)
+    					currentBytes.add(all_data_copy.get(j).remove(0));
     			for (int i=0;i<8;i++)//the bit we want
     			{
     				int x = 0;
     				for (int j=0;j<currentBytes.size();j++)//the test we want
     					x = x | (((currentBytes.get(j).byteValue() & (1 << i))>> i) << (j));
     				
-    				completeData.add(new DataPair(currentBytes.size(),x));
+    				completeDataBitByBit.add(new DataPair(currentBytes.size(),x));
     			}
     			
     			if (currentBytes.size()==0) stillMore = false;
     		}
     		
-    		final Analysis finalAnalysis = new Analysis("Total Data");
-    		finalAnalysis.runAnalysis(completeData);
     		
-    		ArrayList<Byte> random_bytes = finalAnalysis.getRandomBytes();
-    		
-    		try{
-	    		File myFile = new File("/sdcard/random_bytes"+timestamp+".csv");
-	            myFile.createNewFile();
-	            FileOutputStream fOut = new FileOutputStream(myFile);
-	            OutputStreamWriter myOutWriter = 
-	                                    new OutputStreamWriter(fOut);
-	            
-	            myOutWriter.append("Period,"+PERIOD+"\r\n");
-	            myOutWriter.append("Rounds,"+ROUNDS+"\r\n");
-	            for (Test test : tests)
-	            	myOutWriter.append(test.getClass().getSimpleName()+"\r\n");
-	            for (int i=0;i<random_bytes.size();i++)
-	            	myOutWriter.append(""+random_bytes.get(i)+"\r\n");
-	            myOutWriter.close();
-    		}catch(Exception e){}
-    		try {
- 		       FileOutputStream out = new FileOutputStream("/sdcard/random_bytes"+timestamp+".raw");
- 		       DataOutputStream dos = new DataOutputStream(out);
- 		       for (int i=0; i<random_bytes.size();i++)
- 		    	   dos.writeByte(random_bytes.get(i).byteValue());
- 		       //dos.write(random_bytes);
- 		       out.close();
-	 		} catch (Exception e) {
-	 		       e.printStackTrace();
-	 		}
-    		try {
-    		       FileOutputStream out = new FileOutputStream("/sdcard/random_bytes"+timestamp+".png");
-    		       Grapher.graph(finalAnalysis).compress(CompressFormat.PNG, 90, out);
-    		       out.close();
-    		} catch (Exception e) {
-    		       e.printStackTrace();
+    		all_data_copy = makeCopy(all_data);
+    		//Bit by bit stop at 2 complete streams (unless there was 1 bit)
+    		stillMore = true;
+    		while (stillMore)
+    		{
+    			ArrayList<Byte> currentBytes = new ArrayList<Byte>();
+    			for (int j=0; j<tests.size();j++)
+    				if (all_data_copy.get(j).size()>0)
+    					currentBytes.add(all_data_copy.get(j).remove(0));
+    			for (int i=0;i<8;i++)//the bit we want
+    			{
+    				int x = 0;
+    				for (int j=0;j<currentBytes.size();j++)//the test we want
+    					x = x | (((currentBytes.get(j).byteValue() & (1 << i))>> i) << (j));
+    				
+    				completeDataBitByBitLimited.add(new DataPair(currentBytes.size(),x));
+    			}
+    			
+    			if (currentBytes.size()==0 || (tests.size()>=2 && currentBytes.size()==1)) stillMore = false;
     		}
     		
+    		final Analysis finalAnalysis[] = new Analysis[3];
+    		finalAnalysis[0] = new Analysis("ByteByByte");
+    		finalAnalysis[0].runAnalysis(completeDataByteByByte);
+    		finalAnalysis[1] = new Analysis("BitByBit");
+    		finalAnalysis[1].runAnalysis(completeDataBitByBit);
+    		finalAnalysis[2] = new Analysis("BitByBitLimited");
+    		finalAnalysis[2].runAnalysis(completeDataBitByBitLimited);
+    		File myFile = new File("/sdcard/random_"+timestamp+"/testinformation.csv");
+    		FileOutputStream fOut;
+    		OutputStreamWriter myOutWriter;
+    		try{
+	    		myFile.createNewFile();
+	    		fOut = new FileOutputStream(myFile);
+	    		myOutWriter = new OutputStreamWriter(fOut);
+	    		myOutWriter.append("Timestamp,"+timestamp+"\r\n");
+	    		for (int i=0; i<tests.size();i++)
+	    		{
+	    			myOutWriter.append(tests.get(i).getClass().getSimpleName()+","+all_data.get(i).size()+"\r\n");
+	    		}
+	    		fOut.close();
+    		}catch(Exception e)
+    		{
+    			e.printStackTrace();
+    		}
+    		for (int i=0; i<3;i++)
+    		{
+	    		ArrayList<Byte> random_bytes = finalAnalysis[i].getRandomBytes();
+	    		
+	    		try{
+		    		myFile = new File("/sdcard/random_"+timestamp+"/"+finalAnalysis[i].description+".csv");
+		            myFile.createNewFile();
+		            fOut = new FileOutputStream(myFile);
+		            myOutWriter = new OutputStreamWriter(fOut);
+		            
+		            myOutWriter.append("Period,"+PERIOD+"\r\n");
+		            myOutWriter.append("Rounds,"+ROUNDS+"\r\n");
+		            for (Test test : tests)
+		            	myOutWriter.append(test.getClass().getSimpleName()+"\r\n");
+		            for (int j=0;j<random_bytes.size();j++)
+		            	myOutWriter.append(""+random_bytes.get(j)+"\r\n");
+		            myOutWriter.close();
+	    		}catch(Exception e){}
+	    		try {
+	 		       FileOutputStream out = new FileOutputStream("/sdcard/random_"+timestamp+"/"+finalAnalysis[i].description+".raw");
+	 		       DataOutputStream dos = new DataOutputStream(out);
+	 		       for (int j=0; j<random_bytes.size();j++)
+	 		    	   dos.writeByte(random_bytes.get(j).byteValue());
+	 		       //dos.write(random_bytes);
+	 		       out.close();
+		 		} catch (Exception e) {
+		 		       e.printStackTrace();
+		 		}
+	    		try {
+	    		       FileOutputStream out = new FileOutputStream("/sdcard/random_"+timestamp+"/"+finalAnalysis[i].description+".png");
+	    		       Grapher.graph(finalAnalysis[i]).compress(CompressFormat.PNG, 90, out);
+	    		       out.close();
+	    		} catch (Exception e) {
+	    		       e.printStackTrace();
+	    		}
+    		}
 	    	runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                 	//shown = 0;
                 	//shown = shown%analyses.size();
-                	((ImageView) TrueRandomStudy.this.findViewById(R.id.forGraph)).setImageBitmap(Grapher.graph(finalAnalysis));
-                	((TextView) TrueRandomStudy.this.findViewById(R.id.testShown)).setText(finalAnalysis.description);
+                	((ImageView) TrueRandomStudy.this.findViewById(R.id.forGraph)).setImageBitmap(Grapher.graph(finalAnalysis[0]));
+                	((TextView) TrueRandomStudy.this.findViewById(R.id.testShown)).setText(finalAnalysis[0].description);
                 }
             });
 	    	
 		}
     }
+	public ArrayList<ArrayList<Byte>> makeCopy(ArrayList<ArrayList<Byte>> all_data) {
+		ArrayList<ArrayList<Byte>> copy = new ArrayList<ArrayList<Byte>>();
+		for (int i=0; i<all_data.size();i++)
+		{
+			copy.add(new ArrayList<Byte>());
+			for (int j=0; j<all_data.get(i).size();j++)
+				copy.get(i).add(all_data.get(i).get(j));
+		}
+		return copy;
+	}
 }
